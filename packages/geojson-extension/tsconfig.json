@@ -1,16 +1,22 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false  ,
     "noEmitOnError": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false ,
+    "noUnusedParameters": false ,
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "ES5",
+    "allowJs": true,
     "outDir": "./lib",
     "lib": ["ES5", "ES2015.Promise", "DOM", "ES2015.Collection", "es2016"],
     "jsx": "react",
-    "types": []
+    "types": [],
+    "baseUrl": "./",
+    "paths": {
+      "Hammer": ["../../node_modules/hammerjs/hammer.js"],
+      "config": ["config"]
+    }
   },
-  "include": ["src/*"]
+  "include": ["typings/index.d.ts","src/*"]
 }

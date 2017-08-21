@@ -18,10 +18,10 @@
   "dependencies": {
     "@jupyterlab/rendermime-interfaces": "^0.3.0",
     "@phosphor/widgets": "^1.3.0",
-    "leaflet": "^1.0.3"
+    "hammerjs": "^2.0.8",
+    "geojs": "git+https://github.com/OpenGeoscience/geojs.git#hackedup"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.0.62",
     "rimraf": "^2.5.2",
     "typescript": "~2.4.1"
   },
