@@ -11,15 +11,7 @@ import {
   IRenderMime
 } from '@jupyterlab/rendermime-interfaces';
 
-//import * as Hammer from 'geojs/geo.ext.js';
-
-//declare function require(name:string);
-//var Hammer = require('hammerjs/hammer.js');
-
 import * as geojs from 'geojs';
-
-// import 'leaflet/dist/leaflet.css';
-
 import '../style/index.css';
 
 
@@ -41,28 +33,6 @@ const CSS_ICON_CLASS = 'jp-MaterialIcon jp-GeoJSONIcon';
  */
 export
 const MIME_TYPE = 'application/geo+json';
-
-/**
- * Set base path for leaflet images.
- */
-// leaflet.Icon.Default.imagePath = 'https://unpkg.com/leaflet/dist/images/';
-
-/**
- * The url template that leaflet tile layers.
- * See http://leafletjs.com/reference-1.0.3.html#tilelayer
- */
-//const URL_TEMPLATE: string = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-/**
- * The options for leaflet tile layers.
- * See http://leafletjs.com/reference-1.0.3.html#tilelayer
- */
-//const LAYER_OPTIONS: TileLayerOptions = {
-//  attribution: 'Map data (c) <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
-//  minZoom: 0,
-//  maxZoom: 18
-//};
-
 
 export
 class RenderedGeoJSON extends Widget implements IRenderMime.IRenderer {
@@ -100,17 +70,10 @@ class RenderedGeoJSON extends Widget implements IRenderMime.IRenderer {
         zoom: 3
       });
       this._map.createLayer('osm');
-      // TODO: Fix this
-
       var layer = this._map.createLayer('feature');
       var reader = geojs.createFileReader('jsonReader', {'layer': layer});
       reader.read(data);
       this._map.draw();
-
-
-      //this._geoJSONLayer = leaflet.geoJSON(data).addTo(this._map);
-      //this._map.fitBounds(this._geoJSONLayer.getBounds());
-      //this._map.invalidateSize();
       resolve(undefined);
     });
   }
@@ -127,14 +90,9 @@ class RenderedGeoJSON extends Widget implements IRenderMime.IRenderer {
       this._map.size({width:this._width, height:this._height});
       this._map.draw();
     }
-    console.log(msg);
-
-    //this._map.fitBounds(this._geoJSONLayer.getBounds());
-    //this._map.invalidateSize();
   }
 
   private _map: geojs.Map;
-  //private _geoJSONLayer: leaflet.GeoJSON;
   private _width = -1;
   private _height = -1;
   private _mimeType: string;
