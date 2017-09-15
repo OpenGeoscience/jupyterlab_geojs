@@ -1,4 +1,5 @@
 # JupyterLab GeoJS Renderer
+![](https://github.com/aashish24/jlgeojsext/blob/master/screenshots/pointdatavis.png)
 
 [GeoJS](https://github.com/opengeoscience/geojs) rendering extension to [JupyterLab](https://github.com/jupyterlab/jupyterlab) for visualization of GeoJSON data formats.
 
