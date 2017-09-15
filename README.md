@@ -11,7 +11,7 @@
 ### Developer install
 
 ```
-git clone https://github.com/gnestor/jupyter-renderers.git
+git clone https://github.com/OpenGeoscience/jupyterlab_geojsextension.git
 cd jupyter-renderers
 npm install
 npm run build
