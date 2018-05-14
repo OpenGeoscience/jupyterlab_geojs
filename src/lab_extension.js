@@ -2,6 +2,8 @@ import {
   Widget
 } from '@phosphor/widgets';
 
+import geo from 'geojs';
+
 import '../style/index.css';
 
 
@@ -29,17 +31,33 @@ class OutputWidget extends Widget {
     super();
     this._mimeType = options.mimeType;
     this.addClass(CLASS_NAME);
+    this._geoMap = null;
+    console.assert(this.node);
+    this._geoMap = geo.map({node: this.node});
+    this._geoMap.createLayer('osm');
+  }
+
+  /**
+   * Dispose of the widget
+   */
+  dispose() {
+    // Dispose of the geojs map
+    this._geoMap.exit();
+    this._geoMap = null;
+    super.dispose();
   }
 
   /**
    * Render GeoJS into this widget's node.
    */
   renderModel(model) {
-    console.log('OutputWidget.renderModel()');
+    //console.log(`OutputWidget.renderModel() ${this._mimeType}`);
     console.dir(model);
     //this.node.textContent = model.data[this._mimeType];
-    this.node.textContent = 'Hello from jupyterlab_geojs';
+    //this.node.textContent = 'Hello from jupyterlab_geojs';
+    this._geoMap.draw();
   }
+
 }
 
 
@@ -55,11 +73,11 @@ const rendererFactory = {
 
 
 const extension = {
-  name: 'GeoJS',
+  name: 'GeoJSMap',
   rendererFactory,
   rank: 0,
   dataType: 'json',documentWidgetFactoryOptions: {
-    name: 'GeoJS',
+    name: 'GeoJSMap',
     primaryFileType: 'geojson',
     fileTypes: ['geojson'],
     defaultFor: []

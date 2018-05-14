@@ -1,6 +1,9 @@
 
 .jp-OutputWidgetGeoJS {
-   
+   min-height: 500px;
+   overflow: auto;
+   resize: vertical;
+   width: 100%;
  }
 
 

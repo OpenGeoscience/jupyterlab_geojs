@@ -31,7 +31,9 @@
   "jupyterlab": {
     "mimeExtension": "lib/lab_extension"
   },
-  "dependencies": {},
+  "dependencies": {
+    "geojs": "^0.16.0"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.18.2",

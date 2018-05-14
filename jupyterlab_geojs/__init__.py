@@ -13,10 +13,10 @@ def _jupyter_nbextension_paths():
     }]
 
 # A display class that can be used within a notebook. 
-#   from jupyterlab_geojs import GeoJS
-#   GeoJS(data)
+#   from jupyterlab_geojs import GeoJSMap
+#   GeoJSMap(data)
     
-class GeoJS(JSON):
+class GeoJSMap(JSON):
     """A display class for displaying GeoJS visualizations in the Jupyter Notebook and IPython kernel.
     
     GeoJS expects a JSON-able dict, not serialized JSON strings.
@@ -27,7 +27,7 @@ class GeoJS(JSON):
     def _ipython_display_(self):
         bundle = {
             'application/geojs': self.data,
-            'text/plain': '<jupyterlab_geojs.GeoJS object>'
+            'text/plain': '<jupyterlab_geojs.GeoJSMap object>'
         }
         metadata = {
             'application/geojs': self.metadata
