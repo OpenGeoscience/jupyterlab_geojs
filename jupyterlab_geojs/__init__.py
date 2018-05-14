@@ -7,7 +7,7 @@ import json
 def _jupyter_nbextension_paths():
     return [{
         'section': 'notebook',
-        'src': 'static',
+        'src': 'nbextension',
         'dest': 'jupyterlab_geojs',
         'require': 'jupyterlab_geojs/extension'
     }]

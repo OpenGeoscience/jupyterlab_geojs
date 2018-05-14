@@ -35,7 +35,10 @@ class OutputWidget extends Widget {
    * Render GeoJS into this widget's node.
    */
   renderModel(model) {
-    this.node.textContent = model.data[this._mimeType];
+    console.log('OutputWidget.renderModel()');
+    console.dir(model);
+    //this.node.textContent = model.data[this._mimeType];
+    this.node.textContent = 'Hello from jupyterlab_geojs';
   }
 }
 

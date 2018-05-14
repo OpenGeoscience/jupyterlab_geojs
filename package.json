@@ -21,8 +21,12 @@
     "watch": "npm-run-all -p watch:*"
   },
   "babel": {
-    "presets": ["latest"],
-    "plugins": ["transform-class-properties"]
+    "presets": [
+      "latest"
+    ],
+    "plugins": [
+      "transform-class-properties"
+    ]
   },
   "jupyterlab": {
     "mimeExtension": "lib/lab_extension"
