@@ -1,0 +1,15 @@
+labextension/lib/
+nbextension/lib/
+nbextension/embed/
+node_modules/
+npm-debug.log
+*.egg-info/
+build/
+dist/
+
+# Compiled javascript
+jupyterlab_geojs/__pycache__/
+jupyterlab_geojs/static/
+
+# OS X
+.DS_Store
