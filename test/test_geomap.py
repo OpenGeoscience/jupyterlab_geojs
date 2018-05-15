@@ -18,6 +18,7 @@ class TestGeoMap(unittest.TestCase):
         #print('shortDescription():', self.shortDescription())
         geo_map = GeoJSMap()
         osm_layer = geo_map.createLayer('osm')
+        feature_layer = geo_map.createLayer('feature')
         data = geo_map._build_data()
         print(data)
         self.assertIsInstance(data, dict)

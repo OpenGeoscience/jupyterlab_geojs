@@ -1,6 +1,6 @@
 #$schema: http://json-schema.org/draft-07/schema#
-title: Map Feature Layer (GeoJS Jupyter Model),
-description: A feature layer contained inside the GeoJS Jupyter Model,
+title: Map OSM Layer (GeoJS Jupyter Model),
+description: An OSM layer contained inside the GeoJS Jupyter Model
 type: object
 allOf:
   - $ref: abstractFeatureLayer.schema.yml
@@ -9,8 +9,7 @@ allOf:
       layerType:
         description: A literal identifying the layer type
         enum:
-          - feature
-
+          - osm
 # Cannot use additionalProperties when composing from mulitple sources
 # additionalProperties: false
 

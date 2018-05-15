@@ -1,4 +1,5 @@
 from IPython.display import display, JSON
+from .geojsfeaturelayer import GeoJSFeatureLayer
 from .geojsosmlayer import GeoJSOSMLayer
 
 # A display class that can be used within a notebook. 
@@ -22,13 +23,13 @@ class GeoJSMap(JSON):
     def createLayer(self, layerType, **kwargs):
         if False: pass
         # elif layerType == 'annotation':
-        #     layer = GeoJSAnnotationLayer(kwargs)
-        # elif layerType == 'feature':
-        #     layer = GeoJSFeatureLayer(kwargs)
+        #     layer = GeoJSAnnotationLayer(**kwargs)
+        elif layerType == 'feature':
+            layer = GeoJSFeatureLayer(**kwargs)
         elif layerType == 'osm':
             layer = GeoJSOSMLayer(**kwargs)
         # elif layerType == 'ui':
-        #     layer = GeoJSUILayer(kwargs)
+        #     layer = GeoJSUILayer(**kwargs)
         else:
             raise Exception('Unrecognized layer type \"{}\"'.format(layerType))
 
