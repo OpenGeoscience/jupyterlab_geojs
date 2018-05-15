@@ -1,0 +1,45 @@
+#$schema: http://json-schema.org/draft-07/schema#
+title: Map Feature Layer (GeoJS Jupyter Model),
+description: A feature layer contained inside the GeoJS Jupyter Model,
+type: object
+properties:
+  layerType:
+    description: A literal identifying the layer type
+    enum:
+      - feature
+  options:
+    description: The options object passed in to the layer constructor
+    type: object
+  featureTypes:
+    description: A list of the feature types to use in this layer
+    type: array
+    items:
+      anyOf:
+        - enum:
+          - choropleth
+          - contour
+          - heatmap
+          - line
+          - pixelmap
+          - point
+          - polygon
+    minItems: 1
+    uniqueItems: true
+  features:
+    description: The list of map features
+    type: array
+    items:
+      description: One map feature (which may contain multiple entities)
+      oneOf:
+        # $ref: ./choroplethFeature.schema
+        # $ref: ./contourFeature.schema
+        - $ref: ./geojsonFeature.schema.yml
+        # $ref: ./heatmapFeature.schema
+        # $ref: ./lineFeature.schema
+        # $ref: ./pixelMapFeature.schema
+        # $ref: ./pointFeature.schema
+        # $ref: ./polygonFeature.schema
+required:
+    - layerType
+additionalProperties: false
+

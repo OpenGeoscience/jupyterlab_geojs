@@ -1,0 +1,225 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoeJS Jupyter Model",
+  "description": "The data model passed from Jupyter kernel to server",
+  "type": "object",
+  "properties": {
+    "layers": {
+      "description": "The list of layers contained in the map",
+      "type": "array",
+      "items": {
+        "description": "One layer in the map",
+        "oneOf": [
+          {
+            "title": "Map Feature Layer (GeoJS Jupyter Model),",
+            "description": "A feature layer contained inside the GeoJS Jupyter Model,",
+            "type": "object",
+            "properties": {
+              "layerType": {
+                "description": "A literal identifying the layer type",
+                "enum": [
+                  "feature"
+                ]
+              },
+              "options": {
+                "description": "The options object passed in to the layer constructor",
+                "type": "object"
+              },
+              "featureTypes": {
+                "description": "A list of the feature types to use in this layer",
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "choropleth",
+                        "contour",
+                        "heatmap",
+                        "line",
+                        "pixelmap",
+                        "point",
+                        "polygon"
+                      ]
+                    }
+                  ]
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "features": {
+                "description": "The list of map features",
+                "type": "array",
+                "items": {
+                  "description": "One map feature (which may contain multiple entities)",
+                  "oneOf": [
+                    {
+                      "title": "GeoJSON Feature (GeoJS Jupyter Model)",
+                      "description": "A GeoJSON feature",
+                      "type": "object",
+                      "properties": {
+                        "featureType": {
+                          "description": "A literal indicating the feature type",
+                          "enum": [
+                            "geojson"
+                          ]
+                        },
+                        "data": {
+                          "description": "This is the geojson object (should be validated elsewhere)",
+                          "type": "object"
+                        },
+                        "file": {
+                          "description": "The path to a file on the local file system",
+                          "type": "string"
+                        },
+                        "url": {
+                          "description": "The url to a geojson file",
+                          "type": "string"
+                        }
+                      },
+                      "oneOf": [
+                        {
+                          "required": [
+                            "featureType",
+                            "data"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "featureType",
+                            "file"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "featureType",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "layerType"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "title": "Map OSM Layer (GeoJS Jupyter Model),",
+            "description": "An OSM layer contained inside the GeoJS Jupyter Model",
+            "allOf": [
+              {
+                "title": "Map Feature Layer (GeoJS Jupyter Model),",
+                "description": "A feature layer contained inside the GeoJS Jupyter Model,",
+                "type": "object",
+                "properties": {
+                  "options": {
+                    "description": "The options object passed in to the layer constructor",
+                    "type": "object"
+                  },
+                  "featureTypes": {
+                    "description": "A list of the feature types to use in this layer",
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "choropleth",
+                            "contour",
+                            "heatmap",
+                            "line",
+                            "pixelmap",
+                            "point",
+                            "polygon"
+                          ]
+                        }
+                      ]
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  },
+                  "features": {
+                    "description": "The list of map features",
+                    "type": "array",
+                    "items": {
+                      "description": "One map feature (which may contain multiple entities)",
+                      "oneOf": [
+                        {
+                          "title": "GeoJSON Feature (GeoJS Jupyter Model)",
+                          "description": "A GeoJSON feature",
+                          "type": "object",
+                          "properties": {
+                            "featureType": {
+                              "description": "A literal indicating the feature type",
+                              "enum": [
+                                "geojson"
+                              ]
+                            },
+                            "data": {
+                              "description": "This is the geojson object (should be validated elsewhere)",
+                              "type": "object"
+                            },
+                            "file": {
+                              "description": "The path to a file on the local file system",
+                              "type": "string"
+                            },
+                            "url": {
+                              "description": "The url to a geojson file",
+                              "type": "string"
+                            }
+                          },
+                          "oneOf": [
+                            {
+                              "required": [
+                                "featureType",
+                                "data"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "featureType",
+                                "file"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "featureType",
+                                "url"
+                              ]
+                            }
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "layerType": {
+                    "description": "A literal identifying the layer type",
+                    "enum": [
+                      "osm"
+                    ]
+                  }
+                }
+              }
+            ],
+            "required": [
+              "layerType"
+            ]
+          }
+        ]
+      }
+    },
+    "options": {
+      "description": "The options object passed in to the map constructor",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

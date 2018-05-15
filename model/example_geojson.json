@@ -1,0 +1,20 @@
+{
+  "layers": [
+    {
+      "layerType": "feature",
+      "featureTypes": ["line", "point", "polygon"],
+      "features": [
+        {
+          "featureType": "geojson",
+          "file": "somefile.geojson"
+        }
+      ]
+    }
+  ],
+  "options": {
+    "center": {
+      "x": -75.0,
+      "y": 40.0
+    }
+  }
+}

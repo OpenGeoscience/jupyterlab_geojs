@@ -16,6 +16,7 @@
     "build:all": "npm run build:lib && npm run build:labextension && npm run build:nbextension",
     "build": "npm run build:lib",
     "prepare": "npm run build",
+    "schema": "node ./model/combine_schemas.js",
     "watch:nbextension": "webpack --watch",
     "watch:lib": "babel src -d lib --watch",
     "watch": "npm-run-all -p watch:*"
@@ -35,16 +36,18 @@
     "geojs": "^0.16.0"
   },
   "devDependencies": {
+    "ajv": "^6.5.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.18.2",
     "babel-loader": "^6.4.0",
-    "babel-preset-latest": "^6.16.0",
     "babel-plugin-transform-class-properties": "^6.19.0",
+    "babel-preset-latest": "^6.16.0",
     "css-loader": "^0.25.0",
     "file-loader": "^0.9.0",
     "json-loader": "^0.5.4",
-    "npm-run-all": "^4.1.1",
+    "json-schema-ref-parser": "^5.0.3",
     "mkdirp": "^0.5.1",
+    "npm-run-all": "^4.1.1",
     "rimraf": "^2.6.2",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
