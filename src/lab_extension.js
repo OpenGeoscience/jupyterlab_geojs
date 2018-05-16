@@ -31,7 +31,6 @@ class OutputWidget extends Widget {
     super();
     this._mimeType = options.mimeType;
     this.addClass(CLASS_NAME);
-    this._geoMap = null;
     console.assert(this.node);
     this._geoMap = geo.map({node: this.node});
     this._geoMap.createLayer('osm');
@@ -48,6 +47,18 @@ class OutputWidget extends Widget {
   }
 
   /**
+   * Handle widget resize
+   */
+  onResize(msg) {
+    console.log('resize');
+    // Update map to its element size
+    this._geoMap.size({
+      width: this._geoMap.node().width(),
+      height: this._geoMap.node().height()
+    });
+  }
+
+  /**
    * Render GeoJS into this widget's node.
    */
   renderModel(model) {
@@ -55,10 +66,11 @@ class OutputWidget extends Widget {
     console.dir(model);
     //this.node.textContent = model.data[this._mimeType];
     //this.node.textContent = 'Hello from jupyterlab_geojs';
+    this.onResize();
     this._geoMap.draw();
   }
 
-}
+}  // OutputWidget
 
 
 /**
