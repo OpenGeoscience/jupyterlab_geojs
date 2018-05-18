@@ -26,7 +26,7 @@ class TestGeoMap(unittest.TestCase):
         self.assertTrue('layers' in data)
 
         source_dir = os.path.abspath(os.path.dirname(__file__))
-        schema_filename = os.path.join(source_dir, os.pardir, 'model', 'model.schema.json')
+        schema_filename = os.path.join(source_dir, os.pardir, os.pardir, 'model', 'model.schema.json')
         schema = None
         with open(schema_filename) as f:
             schema_string = f.read()

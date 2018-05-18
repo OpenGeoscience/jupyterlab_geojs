@@ -1,8 +1,9 @@
 # jupyterlab_geojs
 
-A JupyterLab and Jupyter Notebook extension for rendering GeoJS
+A JupyterLab and Jupyter Notebook extension for rendering geospatial
+data using the GeoJS front end library
 
-![output renderer](http://g.recordit.co/QAsC7YULcY.gif)
+![Example Screenshot](./docs/BasicScreenshot.png)
 
 ## Prerequisites
 
@@ -13,19 +14,15 @@ A JupyterLab and Jupyter Notebook extension for rendering GeoJS
 To render GeoJS output in IPython:
 
 ```python
-from jupyterlab_geojs import GeoJS
+from jupyterlab_geojs import GeoJSMap
+geomap = GeoJSMap()
+geomap.createLayer('osm')
+geomap
 
-GeoJS({
-    "string": "string",
-    "array": [1, 2, 3],
-    "bool": True,
-    "object": {
-        "foo": "bar"
-    }
-})
-```To render a `.geojson` file as a tree, simply open it:
+```
 
-![file renderer](http://g.recordit.co/cbf0xnQHKn.gif)
+[comment]: <> (To render a `.geojson` file simply open it:)
+[comment]: <> ([File Renderer](http://g.recordit.co/cbf0xnQHKn.gif))
 
 
 ## Install

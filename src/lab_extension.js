@@ -44,6 +44,7 @@ class OutputWidget extends Widget {
   dispose() {
     // Dispose of the geojs map
     if (!!this._geoMap) {
+      console.debug('Disposing geo.map');
       this._geoMap.exit();
       this._geoMap = null;
     }
@@ -57,7 +58,7 @@ class OutputWidget extends Widget {
     if (!this._geoMap) {
       return;
     }
-    console.log('resize');
+    console.debug('resize');
     // if (!!msg) {
     //   console.dir(msg);
     // }
@@ -77,12 +78,19 @@ class OutputWidget extends Widget {
     console.dir(model);
     //this.node.textContent = model.data[this._mimeType];
     //this.node.textContent = 'Hello from jupyterlab_geojs';
-    let builder = new GeoJSBuilder();
-    let mapModel = model.data['application/geojs'];
+    let mapModel = model.data[MIME_TYPE];
     if (!mapModel) {
       console.error('mapModel missing');
     }
 
+    // Make sure any existing map is removed
+    if (!!this._geoMap) {
+      console.debug('Deleting geo.map instance');
+      this._geoMap.exit();  // safety first
+      this._geoMap = null;
+    }
+
+    let builder = new GeoJSBuilder();
     this._geoMap = builder.generate(this.node, mapModel);
     this.onResize();
     this._geoMap.draw();
