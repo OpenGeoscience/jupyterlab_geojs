@@ -12,7 +12,7 @@ class GeoJSBuilder {
 
   // Returns geo.map instance
   // Note that caller is responsible for disposing geomap
-  generate(node, model) {
+  generate(node, model={}) {
     if (!!this._geoMap) {
       console.warn('Deleting existing GeoJS instance');
       this._geoMap.exit();  // safety first

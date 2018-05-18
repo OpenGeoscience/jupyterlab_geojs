@@ -17,6 +17,7 @@
     "build": "npm run build:lib",
     "prepare": "npm run build",
     "schema": "node ./model/combine_schemas.js",
+    "test": "node node_modules/babel-cli/bin/babel-node test/jasmine/run.js",
     "watch:nbextension": "webpack --watch",
     "watch:lib": "babel src -d lib --watch",
     "watch": "npm-run-all -p watch:*"
@@ -33,7 +34,8 @@
     "mimeExtension": "lib/lab_extension"
   },
   "dependencies": {
-    "geojs": "^0.16.0"
+    "geojs": "^0.16.0",
+    "jasmine": "^3.1.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
@@ -44,6 +46,7 @@
     "babel-preset-latest": "^6.16.0",
     "css-loader": "^0.25.0",
     "file-loader": "^0.9.0",
+    "jsdom": "^11.10.0",
     "json-loader": "^0.5.4",
     "json-schema-ref-parser": "^5.0.3",
     "mkdirp": "^0.5.1",
