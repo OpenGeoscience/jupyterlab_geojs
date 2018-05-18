@@ -2,7 +2,9 @@ import {
   Widget
 } from '@phosphor/widgets';
 
-import geo from 'geojs';
+import {
+  GeoJSBuilder
+} from './geojsbuilder.js';
 
 import '../style/index.css';
 
@@ -31,9 +33,9 @@ class OutputWidget extends Widget {
     super();
     this._mimeType = options.mimeType;
     this.addClass(CLASS_NAME);
-    console.assert(this.node);
-    this._geoMap = geo.map({node: this.node});
-    this._geoMap.createLayer('osm');
+
+    // Keep reference to geomap, for resizing and dispose
+    this._geoMap = null;
   }
 
   /**
@@ -41,8 +43,10 @@ class OutputWidget extends Widget {
    */
   dispose() {
     // Dispose of the geojs map
-    this._geoMap.exit();
-    this._geoMap = null;
+    if (!!this._geoMap) {
+      this._geoMap.exit();
+      this._geoMap = null;
+    }
     super.dispose();
   }
 
@@ -50,7 +54,14 @@ class OutputWidget extends Widget {
    * Handle widget resize
    */
   onResize(msg) {
+    if (!this._geoMap) {
+      return;
+    }
     console.log('resize');
+    // if (!!msg) {
+    //   console.dir(msg);
+    // }
+    // console.dir(this._geoMap.node());
     // Update map to its element size
     this._geoMap.size({
       width: this._geoMap.node().width(),
@@ -66,6 +77,13 @@ class OutputWidget extends Widget {
     console.dir(model);
     //this.node.textContent = model.data[this._mimeType];
     //this.node.textContent = 'Hello from jupyterlab_geojs';
+    let builder = new GeoJSBuilder();
+    let mapModel = model.data['application/geojs'];
+    if (!mapModel) {
+      console.error('mapModel missing');
+    }
+
+    this._geoMap = builder.generate(this.node, mapModel);
     this.onResize();
     this._geoMap.draw();
   }
