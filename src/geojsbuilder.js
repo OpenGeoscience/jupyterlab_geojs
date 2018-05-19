@@ -7,7 +7,7 @@ import geo from 'geojs';
 
 class GeoJSBuilder {
   constructor() {
-      this._geoMap = null;
+    this._geoMap = null;
   }
 
   // Returns geo.map instance
