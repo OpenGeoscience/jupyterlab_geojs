@@ -2,16 +2,16 @@
 title: Map OSM Layer (GeoJS Jupyter Model),
 description: An OSM layer contained inside the GeoJS Jupyter Model
 type: object
-allOf:
-  - $ref: abstractFeatureLayer.schema.yml
-
-  - properties:
-      layerType:
-        description: A literal identifying the layer type
-        enum:
-          - osm
-# Cannot use additionalProperties when composing from mulitple sources
-# additionalProperties: false
+properties:
+  layerType:
+    description: A literal identifying the layer type
+    enum:
+      - osm
+  options:
+    description: The options object passed in to the layer constructor
+    type: object
 
 required:
     - layerType
+
+additionalProperties: false

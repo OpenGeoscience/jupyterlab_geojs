@@ -13,10 +13,10 @@ from jupyterlab_geojs import GeoJSMap
 
 class TestGeoMap(unittest.TestCase):
 
-    def test_create(self):
-        """Test creating OSM layer"""
-        #print('shortDescription():', self.shortDescription())
-        geo_map = GeoJSMap()
+    def test_basic_model(self):
+        '''Test creating simple map with osm and feature layer'''
+        geo_map = GeoJSMap(zoom=10)  # pass in option to constructor
+        geo_map.center = {'x': -73, 'y': 42.5}  # set option as public member
         osm_layer = geo_map.createLayer('osm')
         feature_layer = geo_map.createLayer('feature')
         data = geo_map._build_data()
@@ -33,6 +33,13 @@ class TestGeoMap(unittest.TestCase):
         schema = json.loads(schema_string)
         print('validating against schema:')
         jsonschema.validate(data, schema)
+
+        # Optionally write result to model file
+        model_filename = os.path.join(source_dir, os.pardir, 'models', 'basic_model.json')
+        data_string = json.dumps(data)
+        with open(model_filename, 'w') as f:
+            f.write(data_string)
+            print('Wrote {}'.format(model_filename))
 
 if __name__ == '__main__':
     unittest.main()

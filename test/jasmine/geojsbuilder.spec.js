@@ -20,17 +20,17 @@ describe('GeoJSBuilder', () => {
   });
 
   it('should instantiate a simple model', () => {
-    let modelString = fs.readFileSync(__dirname + '/../models/model.basic.json');
+    let modelString = fs.readFileSync(__dirname + '/../models/basic_model.json');
     let model = JSON.parse(modelString);
     let node = document.querySelector('#map');
     let builder = new GeoJSBuilder();
     let map = builder.generate(node, model);
 
-    expect(map.layers().length).toBe(1);
+    expect(map.layers().length).toBe(2);
     let center = map.center();
     expect(center.x).toBeCloseTo(model.options.center.x);
     expect(center.y).toBeCloseTo(model.options.center.y);
     let zoom = map.zoom();
-    expect(zoom).toBe(9);
+    expect(zoom).toBe(10);
   });
 });

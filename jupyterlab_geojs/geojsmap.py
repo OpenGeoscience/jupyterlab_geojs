@@ -2,29 +2,51 @@ from IPython.display import display, JSON
 from .geojsfeaturelayer import GeoJSFeatureLayer
 from .geojsosmlayer import GeoJSOSMLayer
 
-# A display class that can be used within a notebook. 
+# A display class that can be used within a notebook.
 #   from jupyterlab_geojs import GeoJSMap
 #   GeoJSMap()
 
 MIME_TYPE = 'application/geojs'
-    
+
 class GeoJSMap(JSON):
     """A display class for displaying GeoJS visualizations in the Jupyter Notebook and IPython kernel.
-    
+
     GeoJSMap expects a JSON-able dict, not serialized JSON strings.
 
     Scalar types (None, number, string) are not allowed, only dict containers.
     """
 
-    def __init__(self, center=None, zoom=None):
+    # List of options (names) to be added as a public member of each instance.
+    # No error checking is done in this class.
+    OptionNames = [
+        'allowRotation',
+        'center',
+        'clampBoundsX',
+        'clampBoundsY',
+        'clampZoom',
+        'discreteZoom',
+        'gcs',
+        'maxBounds',
+        'minZoom',
+        'maxZoom',
+        'rotation',
+        'unitsPerPixel',
+        'zoom'
+    ]
+
+    def __init__(self, **kwargs):
         '''
         '''
         super(GeoJSMap, self).__init__()
         # Public members
-        self.center = center
-        self.zoom = zoom
+        for name in self.__class__.OptionNames:
+            value = kwargs.get(name)
+            setattr(self, name, value)
+        # Todo create attributes for any kwargs not in MemberNames,
+        # for forward compatibility with GeoJS
 
         # Internal members
+        self._options = kwargs
         self._layers = list()
         self._layer_lookup = dict()  # <layer, index>
 
@@ -47,10 +69,12 @@ class GeoJSMap(JSON):
     def _build_data(self):
         data = dict()  # return value
 
-        options = dict()
-        if self.center is not None: options['center'] = self.center
-        if self.zoom is not None: options['zoom'] = self.zoom
-        data['options'] = options
+        # Copy options that have been set
+        for name in self.__class__.OptionNames:
+            value = getattr(self, name, None)
+            if value is not None:
+                self._options[name] = value
+        data['options'] = self._options
 
         layer_list = list()
         for layer in self._layers:
@@ -68,4 +92,4 @@ class GeoJSMap(JSON):
         metadata = {
             MIME_TYPE: self.metadata
         }
-        display(bundle, metadata=metadata, raw=True) 
+        display(bundle, metadata=metadata, raw=True)
