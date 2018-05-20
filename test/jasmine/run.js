@@ -15,6 +15,7 @@ const dom = new JSDOM('<div id="map"></div>');
 global.window = dom.window;
 global.document = dom.window.document;
 global.Image = dom.window.Image;  // needed for 'osm' layer
+global.File = dom.window.File;    // needed for geoFileReader
 
 // For some reason, jsdom not creating userAgent, so do it manually
 let userAgent = `Mozilla/5.0 (${process.platform}) AppleWebKit/537.36 (KHTML, like Gecko) jsdom`;

@@ -33,4 +33,19 @@ describe('GeoJSBuilder', () => {
     let zoom = map.zoom();
     expect(zoom).toBe(10);
   });
+
+  it('should load a geojson object', () => {
+    let modelString = fs.readFileSync(__dirname + '/../models/geojson_model.json');
+    let model = JSON.parse(modelString);
+    let node = document.querySelector('#map');
+    let builder = new GeoJSBuilder();
+    let map = builder.generate(node, model);
+
+    let layers = map.layers()
+    expect(layers.length).toBe(1);
+    let layer = layers[0];
+    let features = layer.features();
+    console.log(`features: ${features.length}`);
+  });
+
 });

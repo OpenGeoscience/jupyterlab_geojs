@@ -6,7 +6,7 @@
       "features": [
         {
           "featureType": "geojson",
-          "file": "somefile.geojson"
+          "url": "http://someserver/somefile.geojson"
         }
       ]
     }

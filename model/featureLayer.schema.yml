@@ -21,6 +21,7 @@ properties:
           - choropleth
           - contour
           - heatmap
+          - geojson
           - line
           - pixelmap
           - point

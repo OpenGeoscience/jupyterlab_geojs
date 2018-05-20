@@ -1,4 +1,5 @@
 from .geojslayer import GeoJSLayer
+from .geojsonfeature import GeoJSONFeature
 
 class GeoJSFeatureLayer:
     """A notebook class for representing feature layers in GeoJS visualizations.
@@ -16,6 +17,17 @@ class GeoJSFeatureLayer:
 
         # Internal members
         self._options = kwargs
+        self._features = list()
+
+    def createFeature(self, feature_type, **kwargs):
+        '''API method to add features to this layer'''
+        if feature_type == 'geojson':
+            feature = GeoJSONFeature(**kwargs)
+        else:
+            raise Exception('Unrecognized feature type \"{}\"'.format(featureType))
+
+        self._features.append(feature)
+        return feature
 
 
     def _build_data(self):
@@ -29,5 +41,10 @@ class GeoJSFeatureLayer:
             if value is not None:
                 self._options[name] = value
         data['options'] = self._options
+
+        feature_data = list()
+        for feature in self._features:
+            feature_data.append(feature._build_data())
+        data['features'] = feature_data
 
         return data

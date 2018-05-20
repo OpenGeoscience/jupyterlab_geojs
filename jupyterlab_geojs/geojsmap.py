@@ -50,15 +50,15 @@ class GeoJSMap(JSON):
         self._layers = list()
         self._layer_lookup = dict()  # <layer, index>
 
-    def createLayer(self, layerType, **kwargs):
+    def createLayer(self, layer_type, **kwargs):
         if False: pass
-        # elif layerType == 'annotation':
+        # elif layer_type == 'annotation':
         #     layer = GeoJSAnnotationLayer(**kwargs)
-        elif layerType == 'feature':
+        elif layer_type == 'feature':
             layer = GeoJSFeatureLayer(**kwargs)
-        elif layerType == 'osm':
+        elif layer_type == 'osm':
             layer = GeoJSOSMLayer(**kwargs)
-        # elif layerType == 'ui':
+        # elif layer_type == 'ui':
         #     layer = GeoJSUILayer(**kwargs)
         else:
             raise Exception('Unrecognized layer type \"{}\"'.format(layerType))

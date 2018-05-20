@@ -35,6 +35,7 @@
                         "choropleth",
                         "contour",
                         "heatmap",
+                        "geojson",
                         "line",
                         "pixelmap",
                         "point",
@@ -63,39 +64,19 @@
                             "geojson"
                           ]
                         },
-                        "data": {
-                          "description": "This is the geojson object (should be validated elsewhere)",
+                        "options": {
+                          "description": "Options passed in to createFeature() method",
                           "type": "object"
                         },
-                        "file": {
-                          "description": "The path to a file on the local file system",
-                          "type": "string"
+                        "data": {
+                          "description": "This is the geojson object (not validated)",
+                          "type": "object"
                         },
                         "url": {
                           "description": "The url to a geojson file",
                           "type": "string"
                         }
                       },
-                      "oneOf": [
-                        {
-                          "required": [
-                            "featureType",
-                            "data"
-                          ]
-                        },
-                        {
-                          "required": [
-                            "featureType",
-                            "file"
-                          ]
-                        },
-                        {
-                          "required": [
-                            "featureType",
-                            "url"
-                          ]
-                        }
-                      ],
                       "additionalProperties": false
                     }
                   ]

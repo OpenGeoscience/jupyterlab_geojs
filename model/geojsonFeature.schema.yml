@@ -7,19 +7,15 @@ properties:
     description: A literal indicating the feature type
     enum:
       - geojson
-  # Represented 1 of 3 ways: data, file, or url
-  data:
-    description: This is the geojson object (should be validated elsewhere)
+  options:
+    description: Options passed in to createFeature() method
     type: object
-  file:
-    description: The path to a file on the local file system
-    type: string
+  # Content represented either as data (object) or url
+  data:
+    description: This is the geojson object (not validated)
+    type: object
   url:
     description: The url to a geojson file
     type: string
 
-oneOf:
-  - {required: [featureType, data]}
-  - {required: [featureType, file]}
-  - {required: [featureType, url]}
 additionalProperties: false
