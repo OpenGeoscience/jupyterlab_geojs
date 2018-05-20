@@ -34,11 +34,14 @@ class TestGeoJSONFeatures(unittest.TestCase):
     def test_geojson_features(self):
         '''Test creating geojson features'''
         geo_map = GeoJSMap()
+        geo_map.center = {'x': -76.5, 'y': 43.0};
+        geo_map.zoom = 7;
+        geo_map.createLayer('osm', renderer='canvas');
         feature_layer = geo_map.createLayer('feature')
         feature_layer.createFeature('geojson', data=ny_polygons)
 
         data = geo_map._build_data()
-        print(data)
+        #print(data)
 
         source_dir = os.path.abspath(os.path.dirname(__file__))
         schema_filename = os.path.join(source_dir, os.pardir, os.pardir, 'model', 'model.schema.json')

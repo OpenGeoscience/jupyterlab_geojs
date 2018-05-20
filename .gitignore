@@ -8,6 +8,9 @@ jupyterlab_geojs/labextension/
 jupyterlab_geojs/nbextension/
 lib/
 
+test/browser/browser.bundle.js
+test/browser/browser.html
+
 # Runtime files
 *checkpoint.*
 

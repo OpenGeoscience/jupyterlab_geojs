@@ -4,6 +4,7 @@
 
 
 import geo from 'geojs';
+console.debug(`Using geojs ${geo.version}`);
 
 class GeoJSBuilder {
   constructor() {
@@ -11,12 +12,20 @@ class GeoJSBuilder {
     this._promiseList = null;  // for loading data
   }
 
+  // Clears the current geo.map instance
+  clear() {
+    if (!!this._geoMap) {
+      this._geoMap.exit();
+      this._geoMap = null;
+    }
+  }
+
   // Returns geo.map instance
   // Note that caller is responsible for disposing geomap
   generate(node, model={}) {
     if (!!this._geoMap) {
       console.warn('Deleting existing GeoJS instance');
-      this._geoMap.exit();  // safety first
+      this.clear()
     }
 
     let options = model.options || {};

@@ -1,0 +1,90 @@
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    title Lab/GeoJS
+    script(src="vue.min.js")
+    style.
+      body {font-family: Verdana;}
+      button, input, textarea {
+        font-size: 12px;
+      }
+      #map {
+        border: 1px solid #333;
+      }
+      .model-string {
+        height: 100px;
+        resize: vertical;
+        width: 100%;
+      }
+  body
+    div
+      h3 jupyterlab_geojs model browser
+      div#vue
+        p
+          label(for="modelFile")
+          input(type="file" name="modelFile" v-model="modelFileName" @change="onFileChange")
+        p
+          label(for="modelString")
+          textarea.model-string(name="modelString", v-model="modelString" placeholder="Load data model as string")
+        p
+          button(@click="draw") Draw
+      div#map
+
+    script(src="browser.bundle.js")
+    script.
+      new Vue({
+        el: '#vue',
+        data: function() {
+          return {
+            builder: null,
+            modelFileName: '',
+            modelString: '',
+          }
+        },  // data
+        methods: {
+          draw: function() {
+            this.builder.clear();
+            let model = JSON.parse(this.modelString);
+            //console.dir(model);
+            let node = document.getElementById('map');
+            let geomap = this.builder.generate(node, model);
+            geomap.draw();
+          },  // draw()
+          onFileChange: function(evt) {
+            //console.dir(evt.target);
+            let files = evt.target.files;
+            if (files.length === 0) {
+              this.modelString = '';
+              return;
+            }
+
+            let f = files[0];
+            //console.dir(f);
+
+            // Only process json files.
+            if (!f.type.match('application/json')) {
+              alert(`Cannot load ${f.name} -- not json`);
+              return;
+            }
+
+            // Read contents
+            let reader = new FileReader();
+            reader.onload = evt => {
+              //- console.log(`result: ${evt}`);
+              //- console.dir(evt);
+              this.modelString = evt.target.result;
+              //- console.log(vm.modelString);
+            };
+            reader.onerror = err => {
+              alert(err);
+            }
+            reader.readAsText(f);
+          },  // onFileChange()
+        },  // methods
+        mounted: function() {
+          // Set default model string
+          this.modelString = '{"options": {"zoom": 10, "center": {"x": -73, "y": 42.5}}, "layers": [{"layerType": "osm", "options": {}}, {"layerType": "feature", "options": {}, "features": []}]}';
+          // Instantiate GeoJSBuilder
+          this.builder = new jupyterlab_geojs.GeoJSBuilder();
+        }
+      });

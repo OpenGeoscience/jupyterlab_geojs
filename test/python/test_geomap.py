@@ -20,7 +20,7 @@ class TestGeoMap(unittest.TestCase):
         osm_layer = geo_map.createLayer('osm')
         feature_layer = geo_map.createLayer('feature')
         data = geo_map._build_data()
-        print(data)
+        #print(data)
         self.assertIsInstance(data, dict)
         self.assertTrue('options' in data)
         self.assertTrue('layers' in data)

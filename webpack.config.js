@@ -84,5 +84,19 @@ module.exports = [
         'nbextension'
       )
     })
-  })
+  }),
+  /**
+   * This bundle contains the implementation of a browser-based
+   * test bed.
+   *
+   */
+  {
+    entry: path.join(__dirname, 'src', 'geojsbuilder.js'),
+    output: {
+      filename: 'browser.bundle.js',
+      library: 'jupyterlab_geojs',
+      libraryTarget: 'var',
+      path: path.join(__dirname, 'test', 'browser'),
+    }
+  },
 ];
