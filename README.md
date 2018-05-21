@@ -21,6 +21,8 @@ geomap
 
 ```
 
+The notebooks folder contains examples.
+
 [comment]: <> (To render a `.geojson` file simply open it:)
 [comment]: <> ([File Renderer](http://g.recordit.co/cbf0xnQHKn.gif))
 
