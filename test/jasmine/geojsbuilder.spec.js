@@ -1,6 +1,7 @@
 // Tests for GeoJSBuilder
 
 import fs from 'fs';
+import geo from 'geojs';
 import { GeoJSBuilder } from '../../src/geojsbuilder.js';
 
 describe('jasmine', () => {
@@ -10,21 +11,42 @@ describe('jasmine', () => {
 });
 
 describe('GeoJSBuilder', () => {
-  it('should be able to initialize a geo.map instance', () => {
+
+  // Use jasmine async support for convenience
+  // (Async not technically required, but simpifies test code.)
+  // Also use mockVGLRenderer()
+  let geoMap = null;
+  beforeEach(function(done) {
+    setTimeout(function() {
+      if (geoMap) {
+        geoMap.exit();
+        geoMap = null;
+      }
+      geo.util.mockVGLRenderer();
+      done();
+    }, 1);
+  });
+
+  afterEach(() => {
+    geo.util.restoreVGLRenderer();
+  });
+
+
+  it('should be able to initialize a geo.map instance', async () => {
     let node = document.querySelector('#map');
     expect(node).toBeDefined();
     let builder = new GeoJSBuilder();
-    let geoMap = builder.generate(node);
+    geoMap = await builder.generate(node);
     expect(geoMap).toBeDefined();
     expect(geoMap.layers().length).toBe(0);
   });
 
-  it('should instantiate a simple model', () => {
+  it('should instantiate a simple model', async () => {
     let modelString = fs.readFileSync(__dirname + '/../models/basic_model.json');
     let model = JSON.parse(modelString);
     let node = document.querySelector('#map');
     let builder = new GeoJSBuilder();
-    let geoMap = builder.generate(node, model);
+    geoMap = await builder.generate(node, model);
 
     expect(geoMap.layers().length).toBe(2);
     let center = geoMap.center();
@@ -34,19 +56,18 @@ describe('GeoJSBuilder', () => {
     expect(zoom).toBe(10);
   });
 
-  it('should load a geojson object', () => {
+  it('should load a geojson object', async () => {
     let modelString = fs.readFileSync(__dirname + '/../models/geojson_model.json');
     let model = JSON.parse(modelString);
-    let node = document.querySelector('#map');
+    //console.dir(model);
+    let node = document.getElementById('map');
     let builder = new GeoJSBuilder();
-    let geoMap = builder.generate(node, model);
+    geoMap = await builder.generate(node, model)
 
     let layers = geoMap.layers()
     expect(layers.length).toBe(2);
-    for (let layer of layers) {
-      console.log(`layer ${layer.name()}, features: ${layer.features().length}`);
-      //console.dir(layer.features());
-    }
+    let layer1 = layers[1];
+    expect(layer1.features().length).toBe(2)  // 1 polygon with 1 edge
   });
 
 });

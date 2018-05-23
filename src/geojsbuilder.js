@@ -20,8 +20,8 @@ class GeoJSBuilder {
     }
   }
 
-  // Returns geo.map instance
-  // Note that caller is responsible for disposing geomap
+  // Returns PROMISE that resolves to geo.map instance
+  // Note that caller is responsible for disposing the geo.map
   generate(node, model={}) {
     if (!!this._geoMap) {
       console.warn('Deleting existing GeoJS instance');
@@ -33,10 +33,17 @@ class GeoJSBuilder {
     const mapOptions = Object.assign(options, {node: node});
     this._geoMap = geo.map(mapOptions);
     this.update(model);
-    return this._geoMap;
+
+    // Return promise that resolves to this._geoMap
+    return new Promise((resolve, reject) => {
+      Promise.all(this._promiseList)
+        .then(() => resolve(this._geoMap), reject => console.error(reject))
+        .catch(error => reject(error));
+    });
   }  // generate()
 
   // Generates geomap layers
+  // Note: Internal logic can push promise instances onto this._promiseList
   update(model) {
     this._promiseList = [];
     let layerModels = model.layers || [];
@@ -45,18 +52,11 @@ class GeoJSBuilder {
       let layerType = layerModel.layerType;
       //console.log(`layerType: ${layerType}`);
       let layer = this._geoMap.createLayer(layerType, options);
+      //console.log(`Renderer is ${layer.rendererName()}`)
       if (layerModel.features) {
         this._createFeatures(layer, layerModel.features)
       }
     }  // for (layerModel)
-
-    // Wait for any promises to resolve, then draw
-    Promise.all(this._promiseList)
-      .then(() => {
-        this._geoMap.draw();
-        let layer = this._geoMap.layers()[0]
-        //console.dir(layer);
-      })
   }  // update()
 
 
@@ -89,17 +89,15 @@ class GeoJSBuilder {
 
   // Loads GeoJSON object
   _loadGeoJSONObject(layer, data) {
-    //console.dir(data);
-    return new Promise(function(resolve, reject) {
-      // Unfortunately, must re-serialize the data in order
-      // to use the geojs file reader
-      let text = JSON.stringify(data);
-      let reader = geo.createFileReader('jsonReader', {layer: layer});
+    // console.dir(layer);
+    // console.dir(data);
+
+    let reader = geo.createFileReader('jsonReader', {layer: layer});
+    return new Promise((resolve, reject) => {
       try {
-        reader.read(text, resolve);
+        reader.read(data, resolve);
       }
       catch (error) {
-        console.log('ERROR');
         console.error(error);
         reject(error);
       }
@@ -107,7 +105,7 @@ class GeoJSBuilder {
   }  // loadGeoJSONData()
 
   _downloadGeoJSONFile(layer, url) {
-    console.log(`_downloadGeoJSONFile: ${url}`);
+    //console.log(`_downloadGeoJSONFile: ${url}`);
     return new Promise(function(resolve, reject) {
       fetch(url)
         .then(response => response.text())

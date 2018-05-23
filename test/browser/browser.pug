@@ -10,6 +10,9 @@ html(lang="en")
       }
       #map {
         border: 1px solid #333;
+        min-height: 400px;
+        overflow: auto;
+        resize: vertical;
       }
       .model-string {
         height: 100px;
@@ -28,6 +31,7 @@ html(lang="en")
           textarea.model-string(name="modelString", v-model="modelString" placeholder="Load data model as string")
         p
           button(@click="draw") Draw
+          button(@click="resize") Resize
       div#map
 
     script(src="browser.bundle.js")
@@ -47,8 +51,8 @@ html(lang="en")
             let model = JSON.parse(this.modelString);
             //console.dir(model);
             let node = document.getElementById('map');
-            let geomap = this.builder.generate(node, model);
-            geomap.draw();
+            this.builder.generate(node, model)
+              .then((geomap) => geomap.draw());
           },  // draw()
           onFileChange: function(evt) {
             //console.dir(evt.target);
@@ -80,6 +84,9 @@ html(lang="en")
             }
             reader.readAsText(f);
           },  // onFileChange()
+          resize () {
+            window.dispatchEvent(new Event('resize'));
+          },  // resize()
         },  // methods
         mounted: function() {
           // Set default model string

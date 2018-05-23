@@ -58,11 +58,6 @@ class OutputWidget extends Widget {
     if (!this._geoMap) {
       return;
     }
-    console.debug('resize');
-    // if (!!msg) {
-    //   console.dir(msg);
-    // }
-    // console.dir(this._geoMap.node());
     // Update map to its element size
     this._geoMap.size({
       width: this._geoMap.node().width(),
@@ -75,9 +70,8 @@ class OutputWidget extends Widget {
    */
   renderModel(model) {
     //console.log(`OutputWidget.renderModel() ${this._mimeType}`);
-    console.dir(model);
+    //console.dir(model);
     //this.node.textContent = model.data[this._mimeType];
-    //this.node.textContent = 'Hello from jupyterlab_geojs';
     let mapModel = model.data[MIME_TYPE];
     if (!mapModel) {
       console.error('mapModel missing');
@@ -91,9 +85,12 @@ class OutputWidget extends Widget {
     }
 
     let builder = new GeoJSBuilder();
-    this._geoMap = builder.generate(this.node, mapModel);
-    this.onResize();
-    this._geoMap.draw();
+    builder.generate(this.node, mapModel)
+      .then(geoMap => {
+        this._geoMap = geoMap;
+        this.onResize();
+        this._geoMap.draw();
+      });
   }
 
 }  // OutputWidget
