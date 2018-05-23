@@ -39,7 +39,8 @@
                         "line",
                         "pixelmap",
                         "point",
-                        "polygon"
+                        "polygon",
+                        "quad"
                       ]
                     }
                   ]
@@ -52,7 +53,30 @@
                 "type": "array",
                 "items": {
                   "description": "One map feature (which may contain multiple entities)",
+                  "type": "object",
                   "oneOf": [
+                    {
+                      "description": "Generic geojs feature",
+                      "type": "object",
+                      "properties": {
+                        "featureType": {
+                          "description": "A literal indicating the feature type",
+                          "enum": [
+                            "line",
+                            "point",
+                            "polygon",
+                            "quad"
+                          ]
+                        },
+                        "options": {
+                          "description": "Options passed in to createFeature() method",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "featureType"
+                      ]
+                    },
                     {
                       "title": "GeoJSON Feature (GeoJS Jupyter Model)",
                       "description": "A GeoJSON feature",

@@ -1,3 +1,4 @@
+from .geojsfeature import GeoJSFeature
 from .geojslayer import GeoJSLayer
 from .geojsonfeature import GeoJSONFeature
 
@@ -21,10 +22,10 @@ class GeoJSFeatureLayer:
 
     def createFeature(self, feature_type, **kwargs):
         '''API method to add features to this layer'''
-        if feature_type == 'geojson':
+        if feature_type == 'geojson':  # special case
             feature = GeoJSONFeature(**kwargs)
         else:
-            raise Exception('Unrecognized feature type \"{}\"'.format(featureType))
+            feature = GeoJSFeature(feature_type, **kwargs)
 
         self._features.append(feature)
         return feature

@@ -63,13 +63,38 @@ class GeoJSBuilder {
   // Creates features
   _createFeatures(layer, featureModels) {
     for (let featureModel of featureModels) {
+      //console.dir(featureModel);
       switch(featureModel.featureType) {
         case 'geojson':
           this._createGeoJSONFeature(layer, featureModel);
         break;
 
+        case 'point':
+        case 'quad':
+          let feature = layer.createFeature(featureModel.featureType);
+          let options = featureModel.options || {};
+          if (options.data) {
+            feature.data(options.data);
+          }
+
+          // If position array included, set position method
+          if (options.position) {
+            feature.position((dataItem, dataIndex) => {
+              return options.position[dataIndex];
+            });
+          }
+
+          // Other options that are simple properties
+          let properties = ['bin', 'gcs', 'style', 'selectionAPI', 'visible']
+          for (let property of properties) {
+            if (options[property]) {
+              feature[property](options[property]);
+            }
+          }
+        break;
+
         default:
-          console.error(`Unrecognized feature type ${featureModel.featureType}`);
+          throw `Unrecognized feature type ${featureModel.featureType}`;
         break;
       }  // switch
     }

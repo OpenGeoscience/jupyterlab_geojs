@@ -6,7 +6,7 @@ from .geojsfeature import GeoJSFeature
 class GeoJSONFeature(GeoJSFeature):
     ''''''
     def __init__(self, data=None, filename=None, url=None, **kwargs):
-        super(GeoJSONFeature, self).__init__('geojson', **kwargs)
+        super(GeoJSONFeature, self).__init__('geojson', config_options=False, **kwargs)
         self._data = None
         self._url = None
 

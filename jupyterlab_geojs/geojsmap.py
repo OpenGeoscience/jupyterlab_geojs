@@ -26,6 +26,7 @@ class GeoJSMap(JSON):
         'clampZoom',
         'discreteZoom',
         'gcs',
+        'ingcs',
         'maxBounds',
         'minZoom',
         'maxZoom',

@@ -70,4 +70,17 @@ describe('GeoJSBuilder', () => {
     expect(layer1.features().length).toBe(2)  // 1 polygon with 1 edge
   });
 
+  it('should load basic features', async () => {
+    let modelString = fs.readFileSync(__dirname + '/../models/basic_features.json');
+    let model = JSON.parse(modelString);
+    let node = document.querySelector('#map');
+    let builder = new GeoJSBuilder();
+    geoMap = await builder.generate(node, model);
+
+    let layers = geoMap.layers()
+    expect(layers.length).toBe(2);
+    let layer1 = layers[1];
+    expect(layer1.features().length).toBe(2)  // 1 point feature, 1 quad feature
+  });
+
 });
