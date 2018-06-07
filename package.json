@@ -2,59 +2,60 @@
   "name": "jupyterlab_geojs",
   "version": "0.1.0",
   "description": "A package for rendering GeoJS in Jupyter",
-  "author": "John Tourtellott <john.tourtellott@kitware.com>",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/*.d.ts",
+    "lib/*.js",
+    "style/*.*"
+  ],
+  "directories": {
+    "lib": "lib/"
+  },
   "keywords": [
     "jupyter",
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "scripts": {
-    "build:lib": "babel src -d lib",
-    "build:labextension": "cd jupyterlab_geojs && rimraf labextension && mkdirp labextension && cd labextension && npm pack ../..",
-    "build:nbextension": "webpack",
-    "build:all": "npm run build:lib && npm run build:labextension && npm run build:nbextension",
-    "build": "npm run build:lib",
-    "prepare": "npm run build",
-    "schema": "node ./model/combine_schemas.js",
-    "test": "node node_modules/babel-cli/bin/babel-node test/jasmine/run.js",
-    "watch:nbextension": "webpack --watch",
-    "watch:lib": "babel src -d lib --watch",
-    "watch": "npm-run-all -p watch:*"
-  },
-  "babel": {
-    "presets": [
-      "latest"
-    ],
-    "plugins": [
-      "transform-class-properties"
-    ]
-  },
   "jupyterlab": {
-    "mimeExtension": "lib/lab_extension"
+    "mimeExtension": true
   },
   "dependencies": {
+    "@jupyter-widgets/base": "^1.1.10",
+    "@jupyterlab/application": "^0.16.3",
+    "@jupyterlab/docregistry": "^0.16.3",
+    "@jupyterlab/notebook": "^0.16.3",
+    "@jupyterlab/rendermime-interfaces": "^1.0.9",
+    "@phosphor/disposable": "^1.1.2",
+    "@phosphor/messaging": "^1.2.2",
+    "@phosphor/widgets": "^1.5.0",
+    "@types/react-dom": "^16.0.6",
+    "babel-cli": "^6.26.0",
     "geojs": "^0.16.0",
-    "jasmine": "^3.1.0"
+    "jsdom": "^11.11.0",
+    "react": "^16.4.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.18.2",
-    "babel-loader": "^6.4.0",
-    "babel-plugin-transform-class-properties": "^6.19.0",
-    "babel-preset-latest": "^6.16.0",
-    "canvas-prebuilt": "^1.6.5-prerelease.1",
-    "css-loader": "^0.25.0",
-    "file-loader": "^0.9.0",
-    "jsdom": "^11.10.0",
-    "json-loader": "^0.5.4",
+    "babel-preset-env": "^1.7.0",
+    "jasmine": "^3.1.0",
     "json-schema-ref-parser": "^5.0.3",
-    "mkdirp": "^0.5.1",
-    "npm-run-all": "^4.1.1",
-    "rimraf": "^2.6.2",
-    "style-loader": "^0.13.1",
-    "url-loader": "^0.5.7",
-    "webpack": "^2.2.0"
-  }
+    "rimraf": "~2.6.2",
+    "typescript": "~2.6.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:schema": "node ./model/combine_schemas.js",
+    "clean": "rimraf lib",
+    "prepack": "npm run clean && npm run build",
+    "test": "node node_modules/babel-cli/bin/babel-node test/jasmine/run.js",
+    "watch": "tsc -w"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
+  "author": "Kitware",
+  "license": "BSD-3-Clause"
 }

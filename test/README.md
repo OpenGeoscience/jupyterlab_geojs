@@ -9,7 +9,8 @@ To the extent practical:
 To run all tests, use this order
 
 ```
-npm run schema        # updates model.schema.json
+npm run build:schema  # updates model.schema.json
 python -m unittest    # tests python code, producing and validating data-model files
-npm run test          # tests javascript code, using the data-model files
+jlpm build            # generates js files in lib/
+npm run test          # tests javascript code (in lib/), using the data-model files
 ```

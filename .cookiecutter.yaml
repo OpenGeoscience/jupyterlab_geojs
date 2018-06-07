@@ -1,7 +1,0 @@
-default_context:
-    author_name: "John Tourtellott"
-    author_email: "john.tourtellott@kitware.com"
-    mime_type: "application/geojs"
-    file_type: "geojson"
-    mime_short_name: "GeoJS"
-    extension_name: "jupyterlab_geojs"

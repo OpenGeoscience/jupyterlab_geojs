@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import geo from 'geojs';
-import { GeoJSBuilder } from '../../src/geojsbuilder.js';
+import { GeoJSBuilder } from '../../lib/geojsbuilder.js';
 
 describe('jasmine', () => {
   it('should be configured for testing', () => {
@@ -14,20 +14,24 @@ describe('GeoJSBuilder', () => {
 
   // Use jasmine async support for convenience
   // (Async not technically required, but simpifies test code.)
+  // Also disable OSM renderer so that we don't have to mock canvas
   // Also use mockVGLRenderer()
   let geoMap = null;
   beforeEach(function(done) {
+    // Wait for async tests
     setTimeout(function() {
       if (geoMap) {
         geoMap.exit();
         geoMap = null;
       }
+      GeoJSBuilder.disableOSMRenderer(true);
       geo.util.mockVGLRenderer();
       done();
     }, 1);
   });
 
   afterEach(() => {
+    GeoJSBuilder.disableOSMRenderer(false);
     geo.util.restoreVGLRenderer();
   });
 

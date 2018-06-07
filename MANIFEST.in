@@ -1,2 +1,0 @@
-graft jupyterlab_geojs/nbextension
-include jupyterlab_geojs/labextension/*.tgz

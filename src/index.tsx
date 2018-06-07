@@ -1,10 +1,8 @@
-import {
-  Widget
-} from '@phosphor/widgets';
+import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
 
-import {
-  GeoJSBuilder
-} from './geojsbuilder.js';
+import { Widget } from '@phosphor/widgets';
+
+import { GeoJSBuilder } from './geojsbuilder.js';
 
 import '../style/index.css';
 
@@ -25,11 +23,11 @@ const CLASS_NAME = 'jp-OutputWidgetGeoJS';
  * A widget for rendering GeoJS.
  */
 export
-class OutputWidget extends Widget {
+class OutputWidget extends Widget implements IRenderMime.IRenderer {
   /**
    * Construct a new output widget.
    */
-  constructor(options) {
+  constructor(options: IRenderMime.IRendererOptions) {
     super();
     this._mimeType = options.mimeType;
     this.addClass(CLASS_NAME);
@@ -54,7 +52,7 @@ class OutputWidget extends Widget {
   /**
    * Handle widget resize
    */
-  onResize(msg) {
+  onResize(msg: Widget.ResizeMessage) {
     if (!this._geoMap) {
       return;
     }
@@ -68,11 +66,14 @@ class OutputWidget extends Widget {
   /**
    * Render GeoJS into this widget's node.
    */
-  renderModel(model) {
+  renderModel(model: IRenderMime.IMimeModel): Promise<void> {
     //console.log(`OutputWidget.renderModel() ${this._mimeType}`);
     //console.dir(model);
     //this.node.textContent = model.data[this._mimeType];
-    let mapModel = model.data[MIME_TYPE];
+    const data = model.data[this._mimeType] as any;
+    //const metadata = model.metadata[this._mimeType] as any || {};
+
+    const mapModel = data;
     if (!mapModel) {
       console.error('mapModel missing');
     }
@@ -85,14 +86,22 @@ class OutputWidget extends Widget {
     }
 
     let builder = new GeoJSBuilder();
-    builder.generate(this.node, mapModel)
-      .then(geoMap => {
-        this._geoMap = geoMap;
-        this.onResize();
-        this._geoMap.draw();
-      });
-  }
+    // Return promise that resolves when builder generates map
+    return new Promise<void>((resolve, reject) => {
+      builder.generate(this.node, mapModel)
+       .then((geoMap:any) => {
+          this._geoMap = geoMap;
+          // Need resize event to get map to fill widget
+          this.onResize(new Widget.ResizeMessage(-1, -1));
+          this._geoMap.draw();
+          resolve();
+       }, reject => console.error(reject))
+      .catch(error => { reject(error); });
+    });
+  }  // renderModel()
 
+  private _geoMap: any;
+  private _mimeType: string;
 }  // OutputWidget
 
 
@@ -100,24 +109,31 @@ class OutputWidget extends Widget {
  * A mime renderer factory for GeoJS data.
  */
 export
-const rendererFactory = {
+const rendererFactory: IRenderMime.IRendererFactory = {
   safe: true,
   mimeTypes: [MIME_TYPE],
   createRenderer: options => new OutputWidget(options)
 };
 
-
-const extension = {
-  name: 'GeoJSMap',
+export
+const extension: IRenderMime.IExtension = {
+  id: 'jupyterlab_geojs:factory',
   rendererFactory,
   rank: 0,
-  dataType: 'json',documentWidgetFactoryOptions: {
+  dataType: 'json',
+  documentWidgetFactoryOptions: {
     name: 'GeoJSMap',
     primaryFileType: 'geojson',
     fileTypes: ['geojson'],
     defaultFor: []
   },
-  fileTypes: []
+  fileTypes: [
+    {
+      name: 'geojs',
+      mimeTypes: [MIME_TYPE],
+      extensions: ['.geojs']
+    }
+  ]
 
 };
 
