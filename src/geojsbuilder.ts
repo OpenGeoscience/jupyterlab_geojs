@@ -30,13 +30,26 @@ export interface IMapModel {
 import * as geo from 'geojs'
 console.debug(`Using geojs ${geo.version}`);
 
+// Static var used to disable OSM layer renderer;
+// For testing, so that we don't need to mock html canvas
+let _disableOSMRenderer: boolean = false;
+
+
 class GeoJSBuilder {
+  // The GeoJS instance
   private _geoMap: any;
+
+  // Promise list used when building geojs map
   private _promiseList: Promise<void | {}>[];
 
   constructor() {
     this._geoMap = null;
     this._promiseList = null;  // for loading data
+  }
+
+  // Sets static var
+  static disableOSMRenderer(state: boolean): void {
+    _disableOSMRenderer = state;
   }
 
   // Clears the current geo.map instance
@@ -78,6 +91,9 @@ class GeoJSBuilder {
       let options = layerModel.options || {};
       let layerType = layerModel.layerType;
       //console.log(`layerType: ${layerType}`);
+      if (_disableOSMRenderer && layerType == 'osm') {
+        options.renderer = null;
+      }
       let layer: any = this._geoMap.createLayer(layerType, options);
       //console.log(`Renderer is ${layer.rendererName()}`)
       if (layerModel.features) {
