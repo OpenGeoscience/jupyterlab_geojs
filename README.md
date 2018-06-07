@@ -37,11 +37,14 @@ jupyter nbextension enable --py --sys-prefix jupyterlab_geojs
 ## Development
 
 ```bash
-pip install -e .
-# For JupyterLab
-jupyter labextension link
-jupyter lab --watch
-# For Notebook
-jupyter nbextension install --symlink --py --sys-prefix jupyterlab_geojs
-jupyter nbextension enable --py --sys-prefix jupyterlab_geojs
+# Install dependencies
+jlpm
+# Build Typescript source
+jlpm build
+# Link your development version of the extension with JupyterLab
+jupyter labextension link .
+# Rebuild Typescript source after making changes
+jlpm build
+# Rebuild JupyterLab after making any changes
+jupyter lab build
 ```
