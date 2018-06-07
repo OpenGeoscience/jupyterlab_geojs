@@ -19,7 +19,7 @@
   ],
 
   "jupyterlab": {
-    "extension": true
+    "mimeExtension": true
   },
   "dependencies": {
     "geojs": "^0.16.0",

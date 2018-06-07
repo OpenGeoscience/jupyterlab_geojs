@@ -1,12 +1,39 @@
 /*
  * Class for generating geomap based on geojs model received from Jupyter kernel.
  */
+//import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
+
+import { JSONObject } from '@phosphor/coreutils';
 
 
-import geo from 'geojs';
+// Local interface definitions - do these need to be exported?
+export interface IFeatureModel {
+  data?: any;
+  featureType: string;
+  options?: JSONObject;
+  url?: string;
+}
+
+export interface ILayerModel {
+  features?: IFeatureModel[];
+  layerType: string;
+  options?: JSONObject;
+}
+
+export interface IMapModel {
+  layers?: ILayerModel[];
+  options?: JSONObject;
+}
+
+
+
+import * as geo from 'geojs'
 console.debug(`Using geojs ${geo.version}`);
 
 class GeoJSBuilder {
+  private _geoMap: any;
+  private _promiseList: Promise<void | {}>[];
+
   constructor() {
     this._geoMap = null;
     this._promiseList = null;  // for loading data
@@ -22,7 +49,7 @@ class GeoJSBuilder {
 
   // Returns PROMISE that resolves to geo.map instance
   // Note that caller is responsible for disposing the geo.map
-  generate(node, model={}) {
+  generate(node: HTMLElement, model: IMapModel={}): Promise<any> {
     if (!!this._geoMap) {
       console.warn('Deleting existing GeoJS instance');
       this.clear()
@@ -30,7 +57,7 @@ class GeoJSBuilder {
 
     let options = model.options || {};
     // Add dom node to the map options
-    const mapOptions = Object.assign(options, {node: node});
+    const mapOptions: Object = Object.assign(options, {node: node});
     this._geoMap = geo.map(mapOptions);
     this.update(model);
 
@@ -44,14 +71,14 @@ class GeoJSBuilder {
 
   // Generates geomap layers
   // Note: Internal logic can push promise instances onto this._promiseList
-  update(model) {
+  update(model: IMapModel={}) {
     this._promiseList = [];
     let layerModels = model.layers || [];
     for (let layerModel of layerModels) {
       let options = layerModel.options || {};
       let layerType = layerModel.layerType;
       //console.log(`layerType: ${layerType}`);
-      let layer = this._geoMap.createLayer(layerType, options);
+      let layer: any = this._geoMap.createLayer(layerType, options);
       //console.log(`Renderer is ${layer.rendererName()}`)
       if (layerModel.features) {
         this._createFeatures(layer, layerModel.features)
@@ -61,7 +88,7 @@ class GeoJSBuilder {
 
 
   // Creates features
-  _createFeatures(layer, featureModels) {
+  _createFeatures(layer: any, featureModels: IFeatureModel[]): any {
     for (let featureModel of featureModels) {
       //console.dir(featureModel);
       switch(featureModel.featureType) {
@@ -79,8 +106,11 @@ class GeoJSBuilder {
 
           // If position array included, set position method
           if (options.position) {
-            feature.position((dataItem, dataIndex) => {
-              return options.position[dataIndex];
+            feature.position((dataItem: any, dataIndex: number) => {
+              // return options.position[dataIndex];
+              let positions: any = options.position;
+              let position: any = positions[dataIndex];
+              return position;
             });
           }
 
@@ -95,13 +125,12 @@ class GeoJSBuilder {
 
         default:
           throw `Unrecognized feature type ${featureModel.featureType}`;
-        break;
       }  // switch
     }
   }  // _createFeatures()
 
   // Generates GeoJSON feature from feature model
-  _createGeoJSONFeature(layer, featureModel) {
+  _createGeoJSONFeature(layer: any, featureModel: IFeatureModel) {
     if (featureModel.data) {
       let p = this._loadGeoJSONObject(layer, featureModel.data);
       this._promiseList.push(p);
@@ -113,7 +142,7 @@ class GeoJSBuilder {
   }
 
   // Loads GeoJSON object
-  _loadGeoJSONObject(layer, data) {
+  _loadGeoJSONObject(layer:any, data: any) {
     // console.dir(layer);
     // console.dir(data);
 
@@ -129,7 +158,7 @@ class GeoJSBuilder {
     })  // new Promise()
   }  // loadGeoJSONData()
 
-  _downloadGeoJSONFile(layer, url) {
+  _downloadGeoJSONFile(layer: any, url: string) {
     //console.log(`_downloadGeoJSONFile: ${url}`);
     return new Promise(function(resolve, reject) {
       fetch(url)

@@ -1,3 +1,22 @@
+import logging
+import os
+
+# Set up logger "commregistry" at jupyterlab_hack/__logs__/commregisty.log
+basename = os.path.basename(__file__)
+dirname = os.path.abspath(os.path.dirname(__file__))
+
+log_name, ext = os.path.splitext(basename)
+log_filename = '{}.log'.format(log_name)
+log_path = os.path.join(dirname, '__logs__', log_filename)
+
+logger = logging.getLogger(log_name)
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler(log_path, 'w')
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+logger.debug('Initialized logger')
+
+
 from IPython.display import display, JSON
 from .geojsfeaturelayer import GeoJSFeatureLayer
 from .geojsosmlayer import GeoJSOSMLayer
@@ -38,6 +57,7 @@ class GeoJSMap(JSON):
     def __init__(self, **kwargs):
         '''
         '''
+        logger.debug('Initializing GeoJSMap')
         super(GeoJSMap, self).__init__()
         # Public members
         for name in self.__class__.OptionNames:
@@ -85,6 +105,7 @@ class GeoJSMap(JSON):
 
 
     def _ipython_display_(self):
+        logger.debug('Enter GeoJSMap._ipython_display_()')
         data = self._build_data()
         bundle = {
             MIME_TYPE: data,
@@ -93,4 +114,6 @@ class GeoJSMap(JSON):
         metadata = {
             MIME_TYPE: self.metadata
         }
+        logging.debug('display bundle: {}'.format(bundle))
+        logging.debug('metadata: {}'.format(metadata))
         display(bundle, metadata=metadata, raw=True)

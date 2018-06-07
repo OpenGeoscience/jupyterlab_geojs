@@ -1,6 +1,6 @@
 # jupyterlab_geojs
 
-A JupyterLab and Jupyter Notebook extension for rendering geospatial
+A JupyterLab notebook extension for rendering geospatial
 data using the GeoJS front end library
 
 ![Example Screenshot](./docs/BasicScreenshot.png)
@@ -11,7 +11,7 @@ data using the GeoJS front end library
 
 ## Usage
 
-To render GeoJS output in IPython:
+To render GeoJS output in JupyterLab:
 
 ```python
 from jupyterlab_geojs import GeoJSMap
@@ -28,8 +28,12 @@ The notebooks folder contains examples.
 
 ```bash
 pip install jupyterlab_geojs
-# For JupyterLab
+
+# For JupyterLab, need widget-manager extension:
+jupyter labextension @jupyter-widgets/jupyterlab-manager
+
 jupyter lab build
+
 # For Notebook
 jupyter nbextension enable --py --sys-prefix jupyterlab_geojs
 ```
@@ -37,7 +41,14 @@ jupyter nbextension enable --py --sys-prefix jupyterlab_geojs
 ## Development
 
 ```bash
-# Install dependencies
+# Install python package
+pip install -e .
+
+# Install widget-manager extension
+jupyter labextension @jupyter-widgets/jupyterlab-manager
+
+
+# Install js dependencies
 jlpm
 # Build Typescript source
 jlpm build

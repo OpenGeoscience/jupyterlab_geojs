@@ -13,6 +13,7 @@ test/browser/browser.html
 
 # Runtime files
 *checkpoint.*
+jupyterlab_geojs/__logs__/
 
 # OS X
 .DS_Store
