@@ -39,7 +39,7 @@ class OutputWidget extends Widget implements IRenderMime.IRenderer {
   /**
    * Dispose of the widget
    */
-  dispose() {
+  dispose(): void {
     // Dispose of the geojs map
     if (!!this._geoMap) {
       console.debug('Disposing geo.map');
@@ -52,7 +52,7 @@ class OutputWidget extends Widget implements IRenderMime.IRenderer {
   /**
    * Handle widget resize
    */
-  onResize(msg: Widget.ResizeMessage) {
+  onResize(msg?: Widget.ResizeMessage): void {
     if (!this._geoMap) {
       return;
     }
@@ -92,7 +92,7 @@ class OutputWidget extends Widget implements IRenderMime.IRenderer {
        .then((geoMap:any) => {
           this._geoMap = geoMap;
           // Need resize event to get map to fill widget
-          this.onResize(new Widget.ResizeMessage(-1, -1));
+          this.onResize();
           this._geoMap.draw();
           resolve();
        }, reject => console.error(reject))

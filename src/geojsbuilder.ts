@@ -53,7 +53,7 @@ class GeoJSBuilder {
   }
 
   // Clears the current geo.map instance
-  clear() {
+  clear(): void {
     if (!!this._geoMap) {
       this._geoMap.exit();
       this._geoMap = null;
@@ -68,9 +68,9 @@ class GeoJSBuilder {
       this.clear()
     }
 
-    let options = model.options || {};
+    let options: JSONObject = model.options || {};
     // Add dom node to the map options
-    const mapOptions: Object = Object.assign(options, {node: node});
+    const mapOptions = Object.assign(options, {node: node});
     this._geoMap = geo.map(mapOptions);
     this.update(model);
 
@@ -84,12 +84,12 @@ class GeoJSBuilder {
 
   // Generates geomap layers
   // Note: Internal logic can push promise instances onto this._promiseList
-  update(model: IMapModel={}) {
+  update(model: IMapModel={}): void {
     this._promiseList = [];
-    let layerModels = model.layers || [];
+    let layerModels: ILayerModel[] = model.layers || [];
     for (let layerModel of layerModels) {
-      let options = layerModel.options || {};
-      let layerType = layerModel.layerType;
+      let options: JSONObject = layerModel.options || {};
+      let layerType: string = layerModel.layerType;
       //console.log(`layerType: ${layerType}`);
       if (_disableOSMRenderer && layerType == 'osm') {
         options.renderer = null;
@@ -114,8 +114,8 @@ class GeoJSBuilder {
 
         case 'point':
         case 'quad':
-          let feature = layer.createFeature(featureModel.featureType);
-          let options = featureModel.options || {};
+          let feature: any = layer.createFeature(featureModel.featureType);
+          let options: JSONObject = featureModel.options || {};
           if (options.data) {
             feature.data(options.data);
           }
@@ -131,7 +131,7 @@ class GeoJSBuilder {
           }
 
           // Other options that are simple properties
-          let properties = ['bin', 'gcs', 'style', 'selectionAPI', 'visible']
+          const properties = ['bin', 'gcs', 'style', 'selectionAPI', 'visible']
           for (let property of properties) {
             if (options[property]) {
               feature[property](options[property]);
@@ -146,23 +146,23 @@ class GeoJSBuilder {
   }  // _createFeatures()
 
   // Generates GeoJSON feature from feature model
-  _createGeoJSONFeature(layer: any, featureModel: IFeatureModel) {
+  _createGeoJSONFeature(layer: any, featureModel: IFeatureModel): void {
     if (featureModel.data) {
-      let p = this._loadGeoJSONObject(layer, featureModel.data);
+      let p: Promise<void | {}> = this._loadGeoJSONObject(layer, featureModel.data);
       this._promiseList.push(p);
     }
     if (featureModel.url) {
-      let p = this._downloadGeoJSONFile(layer, featureModel.url);
+      let p: Promise<void | {}> = this._downloadGeoJSONFile(layer, featureModel.url);
       this._promiseList.push(p);
     }
   }
 
   // Loads GeoJSON object
-  _loadGeoJSONObject(layer:any, data: any) {
+  _loadGeoJSONObject(layer:any, data: any): Promise<void> {
     // console.dir(layer);
     // console.dir(data);
 
-    let reader = geo.createFileReader('jsonReader', {layer: layer});
+    let reader: any = geo.createFileReader('jsonReader', {layer: layer});
     return new Promise((resolve, reject) => {
       try {
         reader.read(data, resolve);
@@ -174,7 +174,7 @@ class GeoJSBuilder {
     })  // new Promise()
   }  // loadGeoJSONData()
 
-  _downloadGeoJSONFile(layer: any, url: string) {
+  _downloadGeoJSONFile(layer: any, url: string): Promise<void> {
     //console.log(`_downloadGeoJSONFile: ${url}`);
     return new Promise(function(resolve, reject) {
       fetch(url)

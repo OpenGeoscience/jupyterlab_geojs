@@ -105,7 +105,7 @@ class GeoJSMap(JSON):
 
 
     def _ipython_display_(self):
-        logger.debug('Enter GeoJSMap._ipython_display_()')
+        #logger.debug('Enter GeoJSMap._ipython_display_()')
         data = self._build_data()
         bundle = {
             MIME_TYPE: data,
