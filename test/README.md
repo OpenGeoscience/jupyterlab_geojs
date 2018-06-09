@@ -9,6 +9,8 @@ To the extent practical:
 To run all tests, use this order
 
 ```
+npm install           # loads modules use for testing
+
 npm run build:schema  # updates model.schema.json
 python -m unittest    # tests python code, producing and validating data-model files
 jlpm build            # generates js files in lib/

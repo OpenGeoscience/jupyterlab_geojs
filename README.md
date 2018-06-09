@@ -63,3 +63,5 @@ jlpm build
 # Rebuild JupyterLab after making any changes
 jupyter lab build
 ```
+
+For testing, see README.md in test/ folder.
