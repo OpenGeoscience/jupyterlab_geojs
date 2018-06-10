@@ -106,7 +106,6 @@ class GeoJSBuilder {
   // Creates features
   _createFeatures(layer: any, featureModels: IFeatureModel[]): any {
     for (let featureModel of featureModels) {
-      //console.dir(featureModel);
       switch(featureModel.featureType) {
         case 'geojson':
           this._createGeoJSONFeature(layer, featureModel);
@@ -128,6 +127,11 @@ class GeoJSBuilder {
               let position: any = positions[dataIndex];
               return position;
             });
+          }
+
+          // For quads, an image can be attached
+          if (options.image) {
+            feature.image(options.image);
           }
 
           // Other options that are simple properties

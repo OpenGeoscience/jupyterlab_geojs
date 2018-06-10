@@ -37,7 +37,7 @@ class TestGeoJSONFeatures(unittest.TestCase):
         geo_map.center = {'x': -76.5, 'y': 43.0};
         geo_map.zoom = 7;
         geo_map.createLayer('osm', renderer='canvas');
-        feature_layer = geo_map.createLayer('feature')
+        feature_layer = geo_map.createLayer('feature', features=['point', 'line', 'polygon'])
         feature_layer.createFeature('geojson', data=ny_polygons)
 
         data = geo_map._build_data()

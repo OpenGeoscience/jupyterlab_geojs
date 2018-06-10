@@ -38,6 +38,7 @@
   "devDependencies": {
     "ajv": "^6.5.0",
     "babel-preset-env": "^1.7.0",
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
     "jasmine": "^3.1.0",
     "json-schema-ref-parser": "^5.0.3",
     "pug-cli": "^1.0.0-alpha6",

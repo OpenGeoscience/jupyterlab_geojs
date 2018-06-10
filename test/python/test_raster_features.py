@@ -21,8 +21,11 @@ class TestRasterFeatures(unittest.TestCase):
         geo_map.center = {'x': -76.5, 'y': 43.0};
         geo_map.zoom = 7;
         geo_map.createLayer('osm');
-        feature_layer = geo_map.createLayer('feature')
-        feature_layer.createFeature('raster', filename=filename)
+        feature_layer = geo_map.createLayer('feature', features=['quad.image'])
+        quad = feature_layer.createFeature('raster', filename=filename)
+        quad.style = {
+            'opacity': 0.5
+        }
 
         data = geo_map._build_data()
         #print(data)

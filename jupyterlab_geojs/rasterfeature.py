@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import pkg_resources
+import time
 
 from .geojsfeature import GeoJSFeature
 
@@ -17,7 +18,17 @@ else:
     HAS_GDAL = True
     from osgeo import gdal, osr
 
-TEMP_DIR = os.path.expanduser('~/temp')
+# Specify temp dir to use for copying gdal datasets
+try:
+    pkg_resources.get_distribution('jupyter_core.paths')
+except pkg_resources.DistributionNotFound:
+    pass
+    TEMP_DIR = os.path.expanduser('~/.jupyterlab_geojs')
+else:
+    import jupyter_core.paths
+    runtime_dir = jupyter_core.paths.jupyter_runtime_dir()
+    TEMP_DIR = os.path.join(runtime_dir, 'geojs')
+print('Using temp_dir {}'.format(TEMP_DIR))
 
 
 class RasterFeature(GeoJSFeature):
@@ -35,7 +46,7 @@ class RasterFeature(GeoJSFeature):
             raise Exception('Missing data or filename parameter -- one must be provided')
 
         # Model raster dataset as geojs quad feature with png image
-        super(RasterFeature, self).__init__('quad', config_options=False, **kwargs)
+        super(RasterFeature, self).__init__('quad', **kwargs)
         self._gdal_dataset = None
 
         if data is not None:
@@ -70,14 +81,15 @@ class RasterFeature(GeoJSFeature):
                 y = gt[3] + px*gt[4] + py*gt[5]
                 corners.append([x, y])
 
-        # GeoJS data is array with corners points for each feature
-        # We have only 1 feature with 4 corner points
-        coords = dict()
-        coords['ul'] = {'x': corners[0][0], 'y': corners[0][1]}
-        coords['ll'] = {'x': corners[1][0], 'y': corners[1][1]}
-        coords['ur'] = {'x': corners[2][0], 'y': corners[2][1]}
-        coords['lr'] = {'x': corners[3][0], 'y': corners[3][1]}
-        options['data'] = [coords]
+        # Feature data is array with image & corners points for each feature
+        # We have only 1 feature
+        # Set corner points
+        feature_data = dict()
+        feature_data['ul'] = {'x': corners[0][0], 'y': corners[0][1]}
+        feature_data['ll'] = {'x': corners[1][0], 'y': corners[1][1]}
+        feature_data['ur'] = {'x': corners[2][0], 'y': corners[2][1]}
+        feature_data['lr'] = {'x': corners[3][0], 'y': corners[3][1]}
+        #options['data'] = [data]
 
         # Get dataset's gcs
         projection = self._gdal_dataset.GetProjection()
@@ -88,9 +100,16 @@ class RasterFeature(GeoJSFeature):
         #print(gcs_string)
         options['intgcs'] = gcs_string
 
+        # Need temp directory to create png dataset
+        os.makedirs(TEMP_DIR, exist_ok=True)
+
+        # Generate filename for interim png file
+        # Use timestamp (presumes creating < 1 png image per second)
+        ts = int(time.time())
+        png_filename = '{}.png'.format(ts)
+
         # Create png dataset
-        # Todo setup temp folder
-        png_path = os.path.join(TEMP_DIR, 'temp.png')
+        png_path = os.path.join(TEMP_DIR, png_filename)
         png_driver = gdal.GetDriverByName('PNG')
         png_dataset = png_driver.CreateCopy(png_path, self._gdal_dataset, strict=0)
         assert(png_dataset)
@@ -100,8 +119,12 @@ class RasterFeature(GeoJSFeature):
         with open(png_path, 'rb') as fp:
             encoded_bytes = base64.b64encode(fp.read())
         encoded_string = 'data:image/png;base64,' + encoded_bytes.decode('ascii')
-        print(encoded_string)
-        options['image'] = encoded_string
+        #print(encoded_string)
+        feature_data['image'] = encoded_string
+
+        options['data'] = [feature_data]
         data['options'] = options
 
+        # Remove temp png file and return
+        os.remove(png_path)
         return data
