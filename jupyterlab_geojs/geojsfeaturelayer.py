@@ -1,6 +1,8 @@
 from .geojsfeature import GeoJSFeature
 from .geojslayer import GeoJSLayer
 from .geojsonfeature import GeoJSONFeature
+from .rasterfeature import RasterFeature
+
 
 class GeoJSFeatureLayer:
     """A notebook class for representing feature layers in GeoJS visualizations.
@@ -24,6 +26,8 @@ class GeoJSFeatureLayer:
         '''API method to add features to this layer'''
         if feature_type == 'geojson':  # special case
             feature = GeoJSONFeature(**kwargs)
+        elif feature_type == 'raster':
+            feature = RasterFeature(**kwargs)
         else:
             feature = GeoJSFeature(feature_type, **kwargs)
 

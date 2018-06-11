@@ -1,1 +1,1 @@
-{"options": {"center": {"y": 42.5, "x": -73}, "zoom": 10}, "layers": [{"options": {}, "layerType": "osm"}, {"options": {}, "layerType": "feature", "features": []}]}
+{"layers": [{"layerType": "osm", "options": {}}, {"features": [], "layerType": "feature", "options": {}}], "options": {"center": {"x": -73, "y": 42.5}, "zoom": 10}}

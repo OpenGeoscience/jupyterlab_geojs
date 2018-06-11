@@ -38,13 +38,19 @@
   "devDependencies": {
     "ajv": "^6.5.0",
     "babel-preset-env": "^1.7.0",
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
     "jasmine": "^3.1.0",
     "json-schema-ref-parser": "^5.0.3",
+    "pug-cli": "^1.0.0-alpha6",
     "rimraf": "~2.6.2",
+    "rollup": "^0.60.1",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
     "typescript": "~2.6.2"
   },
   "scripts": {
     "build": "tsc",
+    "build:browser": "node node_modules/rollup/bin/rollup --config test/browser/rollup.config.js",
     "build:schema": "node ./model/combine_schemas.js",
     "clean": "rimraf lib",
     "prepack": "npm run clean && npm run build",

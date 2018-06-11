@@ -16,7 +16,10 @@ describe('GeoJSBuilder', () => {
   // (Async not technically required, but simpifies test code.)
   // Also disable OSM renderer so that we don't have to mock canvas
   // Also use mockVGLRenderer()
+
+  // USE STATIC/GLOBAL geoMap VARIABLE IN ALL TESTS
   let geoMap = null;
+
   beforeEach(function(done) {
     // Wait for async tests
     setTimeout(function() {
@@ -24,17 +27,24 @@ describe('GeoJSBuilder', () => {
         geoMap.exit();
         geoMap = null;
       }
-      GeoJSBuilder.disableOSMRenderer(true);
       geo.util.mockVGLRenderer();
       done();
     }, 1);
   });
 
   afterEach(() => {
-    GeoJSBuilder.disableOSMRenderer(false);
     geo.util.restoreVGLRenderer();
   });
 
+  // Helper method to load model
+  // @param modelFile: string relative path to input model file (optional)
+  async function initGeoMap(modelFile) {
+    let node = document.querySelector('#map');
+    let modelString = fs.readFileSync(__dirname + '/' + modelFile);
+    let model = JSON.parse(modelString);
+    let builder = new GeoJSBuilder();
+    return builder.generate(node, model);
+  };
 
   it('should be able to initialize a geo.map instance', async () => {
     let node = document.querySelector('#map');
@@ -46,6 +56,7 @@ describe('GeoJSBuilder', () => {
   });
 
   it('should instantiate a simple model', async () => {
+    // Init model locally so that we can query its contents
     let modelString = fs.readFileSync(__dirname + '/../models/basic_model.json');
     let model = JSON.parse(modelString);
     let node = document.querySelector('#map');
@@ -61,12 +72,7 @@ describe('GeoJSBuilder', () => {
   });
 
   it('should load a geojson object', async () => {
-    let modelString = fs.readFileSync(__dirname + '/../models/geojson_model.json');
-    let model = JSON.parse(modelString);
-    //console.dir(model);
-    let node = document.getElementById('map');
-    let builder = new GeoJSBuilder();
-    geoMap = await builder.generate(node, model)
+    geoMap = await initGeoMap('../models/geojson_model.json');
 
     let layers = geoMap.layers()
     expect(layers.length).toBe(2);
@@ -75,16 +81,21 @@ describe('GeoJSBuilder', () => {
   });
 
   it('should load basic features', async () => {
-    let modelString = fs.readFileSync(__dirname + '/../models/basic_features.json');
-    let model = JSON.parse(modelString);
-    let node = document.querySelector('#map');
-    let builder = new GeoJSBuilder();
-    geoMap = await builder.generate(node, model);
+    geoMap = await initGeoMap('../models/basic_features.json');
 
     let layers = geoMap.layers()
     expect(layers.length).toBe(2);
     let layer1 = layers[1];
     expect(layer1.features().length).toBe(2)  // 1 point feature, 1 quad feature
+  });
+
+  it('should load raster features', async () => {
+    geoMap = await initGeoMap('../models/raster_rgb.json')
+
+    let layers = geoMap.layers()
+    expect(layers.length).toBe(2);
+    let layer1 = layers[1];
+    expect(layer1.features().length).toBe(1)  // 1 quad feature
   });
 
 });

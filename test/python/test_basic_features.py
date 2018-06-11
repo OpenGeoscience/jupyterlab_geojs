@@ -19,7 +19,7 @@ class TestBasicFeatures(unittest.TestCase):
         geo_map.center = {'x': -97.67, 'y': 31.80}  # set option as public member
         geo_map.zoom = 4
         osm_layer = geo_map.createLayer('osm')
-        feature_layer = geo_map.createLayer('feature')
+        feature_layer = geo_map.createLayer('feature', features=['point', 'quad'])
 
         # Point data
         cities = [

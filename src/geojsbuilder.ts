@@ -117,8 +117,19 @@ class GeoJSBuilder {
           let feature: any = layer.createFeature(featureModel.featureType);
           let options: JSONObject = featureModel.options || {};
           if (options.data) {
-            feature.data(options.data);
-          }
+            if (featureModel.featureType === 'quad') {
+              // Copy the options.data array, because geojs might
+              // attach a cached texture object, which won't serialze
+              // when saving the associated notebook.
+              let dataCopy: Array<Object> =
+                (options.data as Array<Object>).map(obj => ({...obj}));
+              //console.log(`Same? ${dataCopy[0] == (options.data as Array<Object>)[0]}`);
+              feature.data(dataCopy);
+            }
+            else {
+              feature.data(options.data);
+            }
+          }  // if (options.data)
 
           // If position array included, set position method
           if (options.position) {
