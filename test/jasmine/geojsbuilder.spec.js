@@ -90,7 +90,7 @@ describe('GeoJSBuilder', () => {
   });
 
   it('should load raster features', async () => {
-    geoMap = await initGeoMap('../models/raster_model.json')
+    geoMap = await initGeoMap('../models/raster_rgb.json')
 
     let layers = geoMap.layers()
     expect(layers.length).toBe(2);

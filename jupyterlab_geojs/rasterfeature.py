@@ -68,7 +68,14 @@ class RasterFeature(GeoJSFeature):
         data = super(RasterFeature, self)._build_data()
         options = data.get('options', {})
 
-        # Get corner points
+        # Set up coordinate transform to lonlat coordinates
+        input_ref = osr.SpatialReference()
+        input_ref.ImportFromWkt(self._gdal_dataset.GetProjection())
+        lonlat_ref = osr.SpatialReference()
+        lonlat_ref .ImportFromEPSG(4326)
+        ref_transform = osr.CoordinateTransformation(input_ref, lonlat_ref)
+
+        # Compute corner points
         gt = self._gdal_dataset.GetGeoTransform()
         if gt is None:
             raise Exception('Cannot render raster feature -- input has no geo transform')
@@ -77,8 +84,11 @@ class RasterFeature(GeoJSFeature):
         corners = list()
         for px in [0, num_cols]:
             for py in [0, num_rows]:
-                x = gt[0] + px*gt[1] + py*gt[2]
-                y = gt[3] + px*gt[4] + py*gt[5]
+                native_x = gt[0] + px*gt[1] + py*gt[2]
+                native_y = gt[3] + px*gt[4] + py*gt[5]
+
+                # Convert to lon-lat
+                x,y,z = ref_transform.TransformPoint(native_x, native_y)
                 corners.append([x, y])
 
         # Feature data is array with image & corners points for each feature
@@ -98,7 +108,7 @@ class RasterFeature(GeoJSFeature):
         gcs_value = spatial_ref.GetAttrValue('AUTHORITY', 1)
         gcs_string = '{}:{}'.format(gcs_name, gcs_value)
         #print(gcs_string)
-        options['intgcs'] = gcs_string
+        #options['gcs'] = gcs_string
 
         # Need temp directory to create png dataset
         os.makedirs(TEMP_DIR, exist_ok=True)
