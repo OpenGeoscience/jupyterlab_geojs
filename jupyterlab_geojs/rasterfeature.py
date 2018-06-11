@@ -1,4 +1,5 @@
 import base64
+import glob
 import json
 import os
 import pkg_resources
@@ -28,7 +29,7 @@ else:
     import jupyter_core.paths
     runtime_dir = jupyter_core.paths.jupyter_runtime_dir()
     TEMP_DIR = os.path.join(runtime_dir, 'geojs')
-print('Using temp_dir {}'.format(TEMP_DIR))
+#print('Using temp_dir {}'.format(TEMP_DIR))
 
 
 class RasterFeature(GeoJSFeature):
@@ -135,6 +136,9 @@ class RasterFeature(GeoJSFeature):
         options['data'] = [feature_data]
         data['options'] = options
 
-        # Remove temp png file and return
-        os.remove(png_path)
+        # Remove temp files (gdal creates auxilliary file in addition to .png file)
+        pattern = '{path}/{prefix}.*'.format(path=TEMP_DIR, prefix=ts)
+        for path in glob.iglob(pattern):
+            os.remove(path)
+
         return data

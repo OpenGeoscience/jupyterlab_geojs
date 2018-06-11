@@ -9,7 +9,7 @@ from .geojsosmlayer import GeoJSOSMLayer
 #   from jupyterlab_geojs import GeoJSMap
 #   GeoJSMap()
 
-MIME_TYPE = 'application/geojs'
+MIME_TYPE = 'application/geojs+json'
 
 class GeoJSMap(JSON):
     """A display class for displaying GeoJS visualizations in the Jupyter Notebook and IPython kernel.
@@ -115,6 +115,7 @@ class GeoJSMap(JSON):
         metadata = {
             MIME_TYPE: self.metadata
         }
-        logging.debug('display bundle: {}'.format(bundle))
-        logging.debug('metadata: {}'.format(metadata))
+        if self._logger is not None:
+            self._logger.debug('display bundle: {}'.format(bundle))
+            self._logger.debug('metadata: {}'.format(metadata))
         display(bundle, metadata=metadata, raw=True)

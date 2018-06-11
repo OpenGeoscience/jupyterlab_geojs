@@ -10,7 +10,7 @@ import '../style/index.css';
 /**
  * The default mime type for the extension.
  */
-const MIME_TYPE = 'application/geojs';
+const MIME_TYPE = 'application/geojs+json';
 
 
 /**
