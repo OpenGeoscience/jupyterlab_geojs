@@ -30,7 +30,7 @@ The notebooks folder contains examples.
 pip install jupyterlab_geojs
 
 # For JupyterLab, need widget-manager extension:
-jupyter labextension @jupyter-widgets/jupyterlab-manager
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 jupyter lab build
 
@@ -45,7 +45,7 @@ jupyter nbextension enable --py --sys-prefix jupyterlab_geojs
 pip install -e .
 
 # Install widget-manager extension
-jupyter labextension @jupyter-widgets/jupyterlab-manager
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 
 # Install js dependencies
