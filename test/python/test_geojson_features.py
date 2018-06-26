@@ -1,13 +1,9 @@
-import json
 import logging
-import os
-import sys
 import unittest
-
-import jsonschema
 
 logging.basicConfig(level=logging.DEBUG)
 
+from . import utils
 from jupyterlab_geojs import GeoJSMap
 
 ny_polygons = { "type": "Feature",
@@ -43,21 +39,11 @@ class TestGeoJSONFeatures(unittest.TestCase):
         data = geo_map._build_data()
         #print(data)
 
-        source_dir = os.path.abspath(os.path.dirname(__file__))
-        schema_filename = os.path.join(source_dir, os.pardir, os.pardir, 'model', 'model.schema.json')
-        schema = None
-        with open(schema_filename) as f:
-            schema_string = f.read()
-        schema = json.loads(schema_string)
-        print('validating against schema:')
-        jsonschema.validate(data, schema)
+        # Validate data model against schema
+        utils.validate_model(data)
 
         # Optionally write result to model file
-        model_filename = os.path.join(source_dir, os.pardir, 'models', 'geojson_model.json')
-        data_string = json.dumps(data)
-        with open(model_filename, 'w') as f:
-            f.write(data_string)
-            print('Wrote {}'.format(model_filename))
+        utils.write_model(data, 'geojson_model.json')
 
 if __name__ == '__main__':
     unittest.main()

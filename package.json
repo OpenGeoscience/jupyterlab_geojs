@@ -51,7 +51,7 @@
   "scripts": {
     "build": "tsc",
     "build:browser": "node node_modules/rollup/bin/rollup --config test/browser/rollup.config.js",
-    "build:schema": "node ./model/combine_schemas.js",
+    "build:schema": "node ./project/schema/combine_schemas.js",
     "clean": "rimraf lib",
     "prepack": "npm run clean && npm run build",
     "test": "node node_modules/babel-cli/bin/babel-node test/jasmine/run.js",

@@ -1,13 +1,9 @@
-import json
 import logging
-import os
-import sys
 import unittest
-
-import jsonschema
 
 logging.basicConfig(level=logging.DEBUG)
 
+from . import utils
 from jupyterlab_geojs import GeoJSMap
 
 
@@ -51,22 +47,10 @@ class TestBasicFeatures(unittest.TestCase):
         print(data)
 
         # Validate data model against schema
-        source_dir = os.path.abspath(os.path.dirname(__file__))
-        schema_filename = os.path.join(source_dir, os.pardir, os.pardir, 'model', 'model.schema.json')
-        schema = None
-        with open(schema_filename) as f:
-            schema_string = f.read()
-        schema = json.loads(schema_string)
-        print('validating against schema:')
-        jsonschema.validate(data, schema)
+        utils.validate_model(data)
 
         # Optionally write result to model file
-        model_filename = os.path.join(source_dir, os.pardir, 'models', 'basic_features.json')
-        data_string = json.dumps(data)
-        #data_string = json.dumps(data, sort_keys=True, indent=2)
-        with open(model_filename, 'w') as f:
-            f.write(data_string)
-            print('Wrote {}'.format(model_filename))
+        utils.write_model(data, 'basic_features.json')
 
 if __name__ == '__main__':
     unittest.main()
