@@ -11,6 +11,7 @@ from .geojsosmlayer import GeoJSOSMLayer
 
 MIME_TYPE = 'application/geojs+json'
 
+
 class GeoJSMap(JSON):
     """A display class for displaying GeoJS visualizations in the Jupyter Notebook and IPython kernel.
 
@@ -54,6 +55,15 @@ class GeoJSMap(JSON):
         self._layers = list()
         self._layer_lookup = dict()  # <layer, index>
         self._logger = None
+        # Tracks the zoom & center coordinates in different representations
+        self._viewpoint = type('ViewPoint', (object,), dict())
+        self._viewpoint.mode = None
+        self._viewpoint.bounds = {
+            'left':   None,
+            'top':    None,
+            'right':  None,
+            'bottom': None
+        }
 
     def createLayer(self, layer_type, **kwargs):
         if False: pass
@@ -87,6 +97,22 @@ class GeoJSMap(JSON):
         self._logger.addHandler(fh)
         return self._logger
 
+    def set_zoom_and_center(self, enable=True, corners=None):
+        '''Sets map zoom and center based on input args
+
+        @param enable: (boolean) command geojs to set map's zoom & center coords
+        @param corners: (list of [x,y]) bounding box specified by 4 corner points
+        '''
+        if not enable or corners is None:
+            self._viewpoint.mode = None
+        elif corners is not None:
+            self._viewpoint.mode = 'bounds'
+            x_coords,y_coords = zip(*corners)
+            self._viewpoint.bounds['left']   = min(x_coords)
+            self._viewpoint.bounds['right']  = max(x_coords)
+            self._viewpoint.bounds['top']    = max(y_coords)
+            self._viewpoint.bounds['bottom'] = min(y_coords)
+
     def _build_data(self):
         data = dict()  # return value
 
@@ -96,6 +122,13 @@ class GeoJSMap(JSON):
             if value is not None:
                 self._options[name] = value
         data['options'] = self._options
+
+        if self._viewpoint.mode is None:
+            data['viewpoint'] = None
+        else:
+            data['viewpoint'] = {'mode': self._viewpoint.mode}
+            if 'bounds' == self._viewpoint.mode:
+                data['viewpoint']['bounds'] = self._viewpoint.bounds
 
         layer_list = list()
         for layer in self._layers:

@@ -23,6 +23,7 @@ export interface ILayerModel {
 export interface IMapModel {
   layers?: ILayerModel[];
   options?: JSONObject;
+  viewpoint?: JSONObject;
 }
 
 
@@ -63,6 +64,7 @@ class GeoJSBuilder {
   // Returns PROMISE that resolves to geo.map instance
   // Note that caller is responsible for disposing the geo.map
   generate(node: HTMLElement, model: IMapModel={}): Promise<any> {
+    console.dir(model);
     if (!!this._geoMap) {
       console.warn('Deleting existing GeoJS instance');
       this.clear()
@@ -73,6 +75,24 @@ class GeoJSBuilder {
     const mapOptions = Object.assign(options, {node: node});
     this._geoMap = geo.map(mapOptions);
     this.update(model);
+    const viewpoint: JSONObject = model.viewpoint;
+    if (viewpoint) {
+      switch (viewpoint.mode) {
+        case 'bounds':
+          console.log('Input viewpoint bounds:');
+          console.dir(viewpoint.bounds);
+          let spec = this._geoMap.zoomAndCenterFromBounds(viewpoint.bounds, 0, null);
+          console.log('Computed viewpoint spec:')
+          console.dir(spec);
+          this._geoMap.center(spec.center);
+          this._geoMap.zoom(spec.zoom/2);  // apparently a factor of 2 difference (?)
+        break;
+
+        default:
+          console.warn(`Unrecognized viewpoint object ${model.viewpoint}`);
+          console.dir(model.viewpoint);
+      }
+    }
 
     // Return promise that resolves to this._geoMap
     return new Promise((resolve, reject) => {

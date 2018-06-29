@@ -139,6 +139,13 @@
     "options": {
       "description": "The options object passed in to the map constructor",
       "type": "object"
+    },
+    "viewpoint": {
+      "description": "The viewpoint specification (optional)",
+      "type": [
+        "null",
+        "object"
+      ]
     }
   },
   "additionalProperties": false
