@@ -1,0 +1,24 @@
+#"$schema": "http://json-schema.org/draft-07/schema#"
+title: Binary Data Feature Type (GeoJS Jupyter Model)
+description: Any feature that is input as binary data
+type: object
+properties:
+  featureType:
+    description: A literal indicating the feature type
+    enum:
+      - pointcloud
+      # - raster
+  options:
+    description: Options passed to createFeature() method
+    type: object
+  # Content represented either as data (uuencoded string) or url
+  data:
+    description: A uuencoded copy of the file contents
+    type: string
+  url:
+    description: The url for downloading the data
+    type: string
+
+additionalProperties: false
+required:
+  - featureType

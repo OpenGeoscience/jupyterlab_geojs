@@ -2,7 +2,7 @@
   "layers": [
     {
       "layerType": "feature",
-      "featureTypes": ["line", "point", "polygon"],
+      "featureTypes": ["point", "quad"],
       "features": [
         {
           "featureType": "geojson",

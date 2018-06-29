@@ -32,14 +32,7 @@
                   "anyOf": [
                     {
                       "enum": [
-                        "choropleth",
-                        "contour",
-                        "heatmap",
-                        "geojson",
-                        "line",
-                        "pixelmap",
                         "point",
-                        "polygon",
                         "quad"
                       ]
                     }
@@ -78,6 +71,35 @@
                       ]
                     },
                     {
+                      "title": "Binary Data Feature Type (GeoJS Jupyter Model)",
+                      "description": "Any feature that is input as binary data",
+                      "type": "object",
+                      "properties": {
+                        "featureType": {
+                          "description": "A literal indicating the feature type",
+                          "enum": [
+                            "pointcloud"
+                          ]
+                        },
+                        "options": {
+                          "description": "Options passed to createFeature() method",
+                          "type": "object"
+                        },
+                        "data": {
+                          "description": "A uuencoded copy of the file contents",
+                          "type": "string"
+                        },
+                        "url": {
+                          "description": "The url for downloading the data",
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "featureType"
+                      ]
+                    },
+                    {
                       "title": "GeoJSON Feature (GeoJS Jupyter Model)",
                       "description": "A GeoJSON feature",
                       "type": "object",
@@ -101,7 +123,10 @@
                           "type": "string"
                         }
                       },
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "required": [
+                        "featureType"
+                      ]
                     }
                   ]
                 }
