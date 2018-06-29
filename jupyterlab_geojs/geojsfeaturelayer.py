@@ -1,6 +1,7 @@
 from .geojsfeature import GeoJSFeature
 from .geojslayer import GeoJSLayer
 from .geojsonfeature import GeoJSONFeature
+from .pointcloudfeature import PointCloudFeature
 from .rasterfeature import RasterFeature
 
 
@@ -24,8 +25,11 @@ class GeoJSFeatureLayer:
 
     def createFeature(self, feature_type, **kwargs):
         '''API method to add features to this layer'''
-        if feature_type == 'geojson':  # special case
+        # Handle special cases first
+        if feature_type == 'geojson':
             feature = GeoJSONFeature(**kwargs)
+        elif feature_type == 'pointcloud':
+            feature = PointCloudFeature(**kwargs)
         elif feature_type == 'raster':
             feature = RasterFeature(**kwargs)
         else:
