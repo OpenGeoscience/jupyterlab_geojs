@@ -3,6 +3,7 @@ import json
 import os
 
 from .geojsfeature import GeoJSFeature
+from .lasutils import LASMetadata, LASParser
 
 class PointCloudFeature(GeoJSFeature):
     ''''''
@@ -12,9 +13,13 @@ class PointCloudFeature(GeoJSFeature):
 
         super(PointCloudFeature, self).__init__('pointcloud', config_options=False, **kwargs)
 
+        # Input source
         self._filename = None
         self._source_data = None
         self._url = None
+
+        # Other member data
+        self._las_metadata = LASMetadata()
 
         if data is not None:
             self._source_data = data
@@ -25,6 +30,85 @@ class PointCloudFeature(GeoJSFeature):
                 raise Exception('Cannot find file {}'.format(filename))
         if url is not None:
             self._url = url
+
+        parser = LASParser()
+        if self._source_data:
+            import io
+            instream = io.BytesIO(self._source_data)
+        elif self._filename:
+            instream = open(self._filename, 'rb')
+        elif self._url:
+            raise Exception('Sorry - url input not yet supported')
+
+        try:
+            self._las_metadata = parser.parse(instream)
+        except Exception:
+            raise
+        finally:
+            instream.close()
+
+        # print(self._las_metadata.header)
+        # print(self._las_metadata.projection_wkt)
+
+    def get_bounds(self, as_lonlat=False):
+        '''Returns tuple (xmin,xmax,ymin,ymax,zmin,zmax)
+
+        Converts to lon/lat if flag set (requires gdal)
+        Returns None if required metadata not available
+        '''
+        h = self._las_metadata.header
+        bounds = (h.min_x,h.max_x, h.min_y,h.max_y, h.min_z,h.max_z)
+        return bounds
+
+    def get_las_header(self):
+        '''Returns unpacked struct from LAS public header
+
+        Returns None if source data is not LAS or LAZ
+        '''
+        return self._las_metadata.header
+
+    def get_point_attributes(self):
+        '''Returns tuple of strings
+
+        For LAS data, based on point data record format
+        '''
+        return None
+
+    def get_point_count(self):
+        '''Returns unsigned long
+        '''
+        h = self._las_metadata.header
+        if h.legacy_point_count:
+            return h.legacy_point_count
+        elif h.number_of_point_records:
+            return h.number_of_point_records
+        # (else)
+        return None
+
+    def get_point_count_by_return(self):
+        ''' Returns standard LAS 5-tuple
+
+        '''
+        h = self._las_metadata.header
+        if h.legacy_point_count:
+            return h.legacy_number_of_points_by_return
+        elif h.number_of_point_records:
+            return h.number_of_points_by_return
+        # (else)
+        return None
+
+    def get_proj_string(self):
+        '''Returns Proj4 string
+
+        Requires gdal to be installed in the python environment
+        '''
+        return None
+
+    def get_wkt_string(self):
+        '''Returns coordinate system WKT
+
+        '''
+        return self._las_metadata.projection_wkt
 
 
     def _build_data(self):
