@@ -1,9 +1,9 @@
 import base64
-import json
 import os
 
+from . import gdalutils
 from .geojsfeature import GeoJSFeature
-from .lasutils import LASMetadata, LASParser
+from .lasutils import LASMetadata, LASParser, LASPointAttributes
 
 class PointCloudFeature(GeoJSFeature):
     ''''''
@@ -53,11 +53,23 @@ class PointCloudFeature(GeoJSFeature):
     def get_bounds(self, as_lonlat=False):
         '''Returns tuple (xmin,xmax,ymin,ymax,zmin,zmax)
 
-        Converts to lon/lat if flag set (requires gdal)
+        Converts xy components to lon/lat if flag is set (requires gdal)
         Returns None if required metadata not available
         '''
         h = self._las_metadata.header
-        bounds = (h.min_x,h.max_x, h.min_y,h.max_y, h.min_z,h.max_z)
+
+        if as_lonlat:
+            wkt = self.get_wkt_string()
+            if wkt is None:
+                raise Exception('Cannot convert points because WKT string is None')
+
+            # Convert xy min & max points to lon lat
+            native_points = [[h.min_x, h.min_y], [h.max_x, h.max_y]]
+            lonlat = gdalutils.convert_points_to_lonlat(native_points, wkt)
+            bounds = (lonlat[0][0],lonlat[1][0], lonlat[0][1],lonlat[1][1], h.min_z,h.max_z)
+        else:
+            bounds = (h.min_x,h.max_x, h.min_y,h.max_y, h.min_z,h.max_z)
+
         return bounds
 
     def get_las_header(self):
@@ -67,12 +79,21 @@ class PointCloudFeature(GeoJSFeature):
         '''
         return self._las_metadata.header
 
+    def get_point_data_record_format(self):
+        ''''''
+        return self._las_metadata.header.point_data_record_format
+
     def get_point_attributes(self):
         '''Returns tuple of strings
 
-        For LAS data, based on point data record format
+        For LAS data, return value is based on point data record format
         '''
-        return None
+        format = self._las_metadata.header.point_data_record_format
+        # Mod by 128, because LAZ headers add 128
+        # Per http://www.cs.unc.edu/~isenburg/lastools/download/laszip.pdf
+        format %= 128
+        atts = LASPointAttributes.get(format)
+        return atts
 
     def get_point_count(self):
         '''Returns unsigned long

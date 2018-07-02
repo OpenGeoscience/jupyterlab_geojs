@@ -2,7 +2,7 @@ import os
 import unittest
 
 from . import utils
-from jupyterlab_geojs import GeoJSMap
+from jupyterlab_geojs import GeoJSMap, gdalutils
 
 
 class TestPointCloudFeatures(unittest.TestCase):
@@ -58,6 +58,17 @@ class TestPointCloudFeatures(unittest.TestCase):
         self.assertAlmostEqual(bounds[5], max_z)
 
         self.assertIsNotNone(pointcloud.get_wkt_string())
+        # print(pointcloud.get_point_data_record_format())
+        # atts = pointcloud.get_point_attributes()
+        # print(atts)
+
+        if gdalutils.is_gdal_loaded():
+            lonlat_bounds = pointcloud.get_bounds(as_lonlat=True)
+            #print('lonlat_bounds: {}'.format(lonlat_bounds))
+            min_x = -106.068729935  # (lon)
+            max_y =   35.992260517  # (lat)
+            self.assertAlmostEqual(lonlat_bounds[0], min_x, 6)  # lon min
+            self.assertAlmostEqual(lonlat_bounds[3], max_y, 6)  # lat max
 
         data = geo_map._build_data()
 

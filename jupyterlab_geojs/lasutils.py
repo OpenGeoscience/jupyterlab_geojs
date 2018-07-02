@@ -249,3 +249,94 @@ class LASParser:
             input_bytes = input_bytes.split(b'\0',1)[0]
         output_string = str(input_bytes, encoding=encoding)
         return output_string
+
+
+# Transcribe point attribute names for point data record formats,
+# as of July 2018, LAS version 1.4, per https://www.asprs.org
+# Transcribed by hand, so user beware
+LASPointAttributes = dict()
+LASPointAttributes[0] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Scan Direction Flag',
+    'Edge of Flight Line', 'Classification',
+    'Scan Angle Rank (-90 to +90) – Left side', 'User Data'
+    )
+LASPointAttributes[1] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Scan Direction Flag',
+    'Edge of Flight Line', 'Classification',
+    'Scan Angle Rank (-90 to +90) – Left side', 'User Data',
+    'Point Source ID', 'GPS Time'
+    )
+
+LASPointAttributes[2] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Scan Direction Flag',
+    'Edge of Flight Line', 'Classification',
+    'Scan Angle Rank (-90 to +90) – Left side', 'User Data',
+    'Point Source ID', 'Red', 'Green', 'Blue'
+    )
+LASPointAttributes[3] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Scan Direction Flag',
+    'Edge of Flight Line', 'Classification',
+    'Scan Angle Rank (-90 to +90) – Left side', 'User Data',
+    'Point Source ID', 'GPS Time', 'Red', 'Green', 'Blue'
+    )
+LASPointAttributes[4] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Scan Direction Flag',
+    'Edge of Flight Line', 'Classification',
+    'Scan Angle Rank (-90 to +90) – Left side', 'User Data',
+    'Point Source ID', 'GPS Time', 'Wave Packet Descriptor Index',
+    'Byte offset to waveform data', 'Return Point Waveform Location',
+    'X(t)', 'Y(t)', 'Z(t)'
+    )
+LASPointAttributes[5] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Scan Direction Flag',
+    'Edge of Flight Line', 'Classification',
+    'Scan Angle Rank (-90 to +90) – Left side', 'User Data',
+    'Point Source ID', 'GPS Time', 'Red', 'Green', 'Blue',
+    'Wave Packet Descriptor Index', 'Byte offset to waveform data',
+    'Return Point Waveform Location', 'X(t)', 'Y(t)', 'Z(t)'
+    )
+LASPointAttributes[6] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Classification Flags',
+    'Scanner Channel', 'Scan Direction Flag', 'Edge of Flight Line',
+    'Classification', 'User Data', 'Scan Angle', 'Point Source ID',
+    'GPS Time'
+    )
+LASPointAttributes[7] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Classification Flags',
+    'Scanner Channel', 'Scan Direction Flag', 'Edge of Flight Line',
+    'Classification', 'User Data', 'Scan Angle',  'Point Source ID',
+    'GPS Time', 'Red', 'Green', 'Blue'
+    )
+LASPointAttributes[8] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Classification Flags',
+    'Scanner Channel', 'Scan Direction Flag', 'Edge of Flight Line',
+    'Classification', 'User Data', 'Scan Angle',  'Point Source ID',
+    'GPS Time', 'Red', 'Green', 'Blue', 'NIR'
+    )
+LASPointAttributes[9] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Classification Flags',
+    'Scanner Channel', 'Scan Direction Flag', 'Edge of Flight Line',
+    'Classification', 'User Data', 'Scan Angle',  'Point Source ID',
+    'GPS Time', 'Wave Packet Descriptor Index',
+    'Byte offset to waveform data', 'Return Point Waveform Location',
+    'X(t)', 'Y(t)', 'Z(t)'
+    )
+LASPointAttributes[10] = (
+    'X', 'Y', 'Z', 'Intensity', 'Return Number',
+    'Number of Returns (given pulse)', 'Classification Flags',
+    'Scanner Channel', 'Scan Direction Flag', 'Edge of Flight Line',
+    'Classification', 'User Data', 'Scan Angle',  'Point Source ID',
+    'GPS Time', 'Red', 'Green', 'Blue', 'NIR',
+    'Wave Packet Descriptor Index', 'Byte offset to waveform data',
+    'Return Point Waveform Location', 'X(t)', 'Y(t)', 'Z(t)'
+    )
