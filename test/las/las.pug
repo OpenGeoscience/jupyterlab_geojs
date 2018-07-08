@@ -1,0 +1,116 @@
+doctype html
+html
+  head
+    meta(http-equiv="Content-type" content="text/html; charset=utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title LAS Test
+    script(src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js")
+    style.
+      body {font-family: verdana;}
+      button, input {
+        min-width: 80px;
+      }
+      span.comment {
+        margin-left: 8px;
+      }
+      #vtk {
+        height: 480px;
+      }
+      h3.notify {
+        color: red;
+      }
+  body
+    div#vue
+      //- Html here references vue members - messy yes, but I don't have to
+          set up a build env for vue
+      div(v-if="!isDone")
+        h3 LAS test
+        p
+          input(:disabled="isLoaded" type="file" name="lasFile" @change="onFileChange")
+        p
+          button(:disabled="!isLoaded || isDisplayed" @click="onDisplayClick") Display
+          span.comment(v-if="pointCount > 0") Loaded binary data ({{pointCount}} points)
+        p
+          button(:disabled="!lasPointCloud" @click="onDeleteClick") Delete
+      div(v-else)
+        h3.notify Reload the page to start again.
+    div#vtk
+
+    script(src="./pointcloud.bundle.js")
+    script.
+      console.log('Page loaded')
+      new Vue({
+        el: '#vue',
+        data: function() {
+          return {
+            isDisplayed: false,
+            isDone: false,
+            lasPointCloud: null,
+            pointCount: 0,
+          }
+        },  // data
+        methods: {
+          onDeleteClick: function() {
+            this.lasPointCloud.dispose();
+
+            let vtkElement = document.querySelector('#vtk');
+            vtkElement.parentNode.removeChild(vtkElement);
+
+            this.isDisplayed = null;
+            this.isDone = true;
+            this.lasPointCloud = null;
+            this.pointCount = 0;
+            console.log('Data should be deleted');
+          },  // deleteLASData()
+          onDisplayClick: function() {
+            let elem = document.querySelector('#vtk');
+            this.lasPointCloud.render(elem);
+            this.isDisplayed = true;
+          },  // onDisplayClick()
+          onFileChange: function(evt) {
+            // Todo reset point cloud?
+            //console.dir(evt.target);
+
+            let files = evt.target.files;
+            if (files.length === 0) {
+              return;
+            }
+
+            // Read contents
+            let fileReader = new FileReader();
+            fileReader.onload = evt => {
+              //console.log(`result: ${evt}`);
+              //console.dir(evt);
+              let lasContent = evt.target.result;
+              console.log(`Loaded content length ${lasContent.byteLength}`);
+
+              try {
+                // console.log(`pointcloud ${pointcloud}, type ${typeof pointcloud}`);
+                // console.dir(pointcloud);
+                this.lasPointCloud = new LASPointCloud();
+                this.lasPointCloud.loadData(lasContent)
+                  .then(() => {
+                    this.pointCount = this.lasPointCloud.pointCount();
+                    console.log(`LAS point count ${this.lasPointCloud.pointCount()}`);
+                    console.log(`LAS version ${this.lasPointCloud.lasVersion()}`);
+                    console.log(`LAS point format ${this.lasPointCloud.pointFormat()}`);              
+                  });
+              }
+              catch(err) {
+                alert(err);
+                return;
+              }
+
+            };  // fileReader.onload()
+            fileReader.onerror = err => {
+              alert(err);
+            }
+            fileReader.readAsArrayBuffer(files[0]);
+          },  // onFileChange()
+        },  // methods
+        computed: {
+          isLoaded: function() {
+            return this.pointCount > 0;
+          }
+        },  // computed
+      });  // Vue()

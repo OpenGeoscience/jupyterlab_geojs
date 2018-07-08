@@ -10,6 +10,8 @@ lib/
 
 test/browser/browser.bundle.js
 test/browser/browser.html
+test/las/las.html
+test/las/pointcloud.bundle.js
 
 # Runtime files
 *checkpoint.*
