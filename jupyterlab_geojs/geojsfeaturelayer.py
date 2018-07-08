@@ -1,7 +1,7 @@
 from .geojsfeature import GeoJSFeature
 from .geojslayer import GeoJSLayer
 from .geojsonfeature import GeoJSONFeature
-from .pointcloudfeature import PointCloudFeature
+# from .pointcloudfeature import PointCloudFeature
 from .rasterfeature import RasterFeature
 
 
@@ -28,8 +28,8 @@ class GeoJSFeatureLayer:
         # Handle special cases first
         if feature_type == 'geojson':
             feature = GeoJSONFeature(**kwargs)
-        elif feature_type == 'pointcloud':
-            feature = PointCloudFeature(**kwargs)
+        # elif feature_type == 'pointcloud':
+        #     feature = PointCloudFeature(**kwargs)
         elif feature_type == 'raster':
             feature = RasterFeature(**kwargs)
         else:
