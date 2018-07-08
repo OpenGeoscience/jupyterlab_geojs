@@ -1,3 +1,7 @@
-import { GeoJSExtension } from './geojsextension';
+import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
 
-export default GeoJSExtension;
+import { GeoJSExtension } from './geojsextension';
+import { PointCloudExtension } from './pointcloudextension';
+
+const extensions: Array<IRenderMime.IExtension> = [GeoJSExtension, PointCloudExtension];
+export default extensions;
