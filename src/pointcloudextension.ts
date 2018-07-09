@@ -2,6 +2,11 @@ import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
 
 import { Widget } from '@phosphor/widgets';
 
+import { decode as base64Decode } from 'base64-arraybuffer';
+
+import { LASPointCloud } from '../lib/JUPYTERLAB_FILE_LOADER_pointcloud.bundle.js';
+
+
 import '../style/index.css';
 
 
@@ -37,8 +42,18 @@ class OutputWidget extends Widget implements IRenderMime.IRenderer {
   renderModel(model: IRenderMime.IMimeModel): Promise<void> {
     //console.log(`OutputWidget.renderModel() ${this._mimeType}`);
     //console.dir(model);
-    this.node.textContent = this._mimeType;
-    return Promise.resolve();
+    const modelData = model.data[this._mimeType] as any;
+    const lasString:string = modelData.data as string;
+    const binaryData: ArrayBuffer = base64Decode(lasString);
+    let pointcloud = new LASPointCloud();
+    return new Promise<void>((resolve, reject) => {
+      pointcloud.loadData(binaryData)
+        .then(() => {
+          // console.log('LASPointCloud instance:');
+          // console.dir(pointcloud);
+          pointcloud.render(this.node);
+        });
+    });
   }  // renderModel()
 
   private _mimeType: string;
