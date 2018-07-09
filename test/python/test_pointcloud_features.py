@@ -5,7 +5,6 @@ from . import utils
 from jupyterlab_geojs import GeoJSMap, gdalutils
 
 
-@unittest.skip('requires vtkjs layers')
 class TestPointCloudFeatures(unittest.TestCase):
 
     def test_las_100points(self):
@@ -30,10 +29,6 @@ class TestPointCloudFeatures(unittest.TestCase):
         self.assertIsNotNone(feature)
         self.assertTrue('data' in feature)
 
-        # Add osm layer and write model file (for testing js)
-        geo_map.createLayer('osm');
-        # geo_map.center = {'x': -76.5, 'y': 43.0};
-        # geo_map.zoom = 7;
         data = geo_map._build_data()
         #print(data)
         utils.write_model(data, 'pointcloud_100.json')
@@ -83,10 +78,6 @@ class TestPointCloudFeatures(unittest.TestCase):
         self.assertIsNotNone(feature)
         self.assertTrue('data' in feature)
 
-        # Add osm layer and write model file (for testing js)
-        geo_map.createLayer('osm');
-        # geo_map.center = {'x': -76.5, 'y': 43.0};
-        # geo_map.zoom = 7;
         data = geo_map._build_data()
         #print(data)
         #utils.write_model(data, 'test1_4.json')

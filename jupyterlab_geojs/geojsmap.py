@@ -4,6 +4,7 @@ import os
 from IPython.display import display, JSON
 from .geojsfeaturelayer import GeoJSFeatureLayer
 from .geojsosmlayer import GeoJSOSMLayer
+from .scenevalidator import SceneValidator
 
 # A display class that can be used in Jupyter notebooks:
 #   from jupyterlab_geojs import GeoJSMap
@@ -49,6 +50,8 @@ class GeoJSMap(JSON):
             setattr(self, name, value)
         # Todo create attributes for any kwargs not in MemberNames,
         # for forward compatibility with GeoJS
+        self._validator = SceneValidator()
+        self._validator.adding_map(self)
 
         # Internal members
         self._options = kwargs
@@ -66,6 +69,7 @@ class GeoJSMap(JSON):
         }
 
     def createLayer(self, layer_type, **kwargs):
+        self._validator.adding_layer(self, layer_type)
         if False: pass
         # elif layer_type == 'annotation':
         #     layer = GeoJSAnnotationLayer(**kwargs)
@@ -79,6 +83,7 @@ class GeoJSMap(JSON):
             raise Exception('Unrecognized layer type \"{}\"'.format(layerType))
 
         self._layers.append(layer)
+        self._validator.added_layer(self, layer)
         return layer
 
     def create_logger(self, folder, filename='geojsmap.log'):
