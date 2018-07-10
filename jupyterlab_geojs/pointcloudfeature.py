@@ -47,6 +47,8 @@ class PointCloudFeature(GeoJSFeature):
         finally:
             instream.close()
 
+        self._check_support()
+
         # print(self._las_metadata.header)
         # print(self._las_metadata.projection_wkt)
 
@@ -158,3 +160,30 @@ class PointCloudFeature(GeoJSFeature):
         encoded_string = encoded_bytes.decode('ascii')
         data['data'] = encoded_string
         return data
+
+    def _check_support(self):
+        '''Checks las version and point record format.
+
+        Our current code does not support all versions of las files:
+        * Only supports file versions 1.0-1.3 (not 1.4)
+        * Only supports point-record formats 0-3 (not 4-10)
+        * Only supports uncompressed data (not laz)
+
+        '''
+        std_msg = 'Only LAS versions 1.0-1.3, point formats 0-3, no compression'
+        h = self._las_metadata.header
+
+        # Only LAS file versions 1.0 - 1.3
+        version_string = '{}.{}'.format(h.version_major, h.version_minor)
+        if h.version_major != 1 or h.version_minor > 3:
+            raise Exception('INVALID: Cannot load LAS file version {}. {}'.format(
+                version_string, std_msg))
+
+        # Only uncompressed data
+        if h.point_data_record_format >= 128:
+            raise Exception('INVALID: Cannot load laz/compressed data. {}'.format(std_msg))
+
+        # Only point record formats 0-3
+        if h.point_data_record_format > 3:
+            raise Exception('INVALID: Cannot load point record format {}. {}'.format(
+                h.point_data_record_format, std_msg))
