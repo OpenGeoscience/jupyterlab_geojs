@@ -1,3 +1,10 @@
+"""
+DEPRECATED
+ * Was used for developing standalone pointcloud display
+ * Replaced with pointcloud feature in Scene objects
+"""
+
+
 import logging
 
 from IPython.display import display, JSON

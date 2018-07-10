@@ -146,12 +146,16 @@ class GeoJSMap(JSON):
         if self._logger is not None:
             self._logger.debug('Enter GeoJSMap._ipython_display_()')
         data = self._build_data()
+
+        # Change mime type for "pointcloud mode"
+        mimetype = 'application/las+json' if self._validator.is_pointcloud(self) else MIME_TYPE
+
         bundle = {
-            MIME_TYPE: data,
+            mimetype: data,
             'text/plain': '<jupyterlab_geojs.GeoJSMap object>'
         }
         metadata = {
-            MIME_TYPE: self.metadata
+            mimetype: self.metadata
         }
         if self._logger is not None:
             self._logger.debug('display bundle: {}'.format(bundle))

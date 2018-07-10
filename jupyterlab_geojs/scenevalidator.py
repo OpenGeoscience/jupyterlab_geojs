@@ -79,6 +79,12 @@ class _SceneValidator:
             else:
                 raise Exception('Cannot add non-pointcloud feature to scene containing pointcloud features')
 
+    def is_pointcloud(self, map):
+        '''Returns boolean indicating whether specific map is pointcloud type
+
+        '''
+        return self._mapDict.get(map) == _SceneMode.POINTCLOUD
+
 
 def SceneValidator():
     if _SceneValidator.instance is None:

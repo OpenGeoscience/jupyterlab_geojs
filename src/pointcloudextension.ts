@@ -1,10 +1,32 @@
 import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
 
+import { JSONObject } from '@phosphor/coreutils';
 import { Widget } from '@phosphor/widgets';
 
 import { decode as base64Decode } from 'base64-arraybuffer';
 
 import { LASPointCloud } from '../lib/JUPYTERLAB_FILE_LOADER_pointcloud.bundle.js';
+
+// Local interface definitions - do these need to be exported?
+export interface IFeatureModel {
+  data: string;
+  featureType: string;
+  options?: JSONObject;
+  url?: string;
+}
+
+export interface ILayerModel {
+  features?: IFeatureModel[];
+  layerType: string;
+  options?: JSONObject;
+}
+
+export interface IMapModel {
+  layers?: ILayerModel[];
+  options?: JSONObject;
+  viewpoint?: JSONObject;
+}
+
 
 
 import '../style/index.css';
@@ -38,22 +60,40 @@ class OutputWidget extends Widget implements IRenderMime.IRenderer {
 
   /**
    * Render into this widget's node.
+   * Current code only supports ONE pointcloud
    */
   renderModel(model: IRenderMime.IMimeModel): Promise<void> {
     //console.log(`OutputWidget.renderModel() ${this._mimeType}`);
     //console.dir(model);
-    const modelData = model.data[this._mimeType] as any;
-    const lasString:string = modelData.data as string;
-    const binaryData: ArrayBuffer = base64Decode(lasString);
-    let pointcloud = new LASPointCloud();
-    return new Promise<void>((resolve, reject) => {
-      pointcloud.loadData(binaryData)
-        .then(() => {
-          // console.log('LASPointCloud instance:');
-          // console.dir(pointcloud);
-          pointcloud.render(this.node);
+    const mapModel = model.data[this._mimeType] as any;
+    if (!mapModel) {
+      console.error('mapModel missing');
+    }
+
+    let layerModels: ILayerModel[] = mapModel.layers || [];
+    for (let layerModel of layerModels) {
+      let featureModels: IFeatureModel[] = layerModel.features;
+      for (let featureModel of featureModels) {
+        const lasString:string = featureModel.data;
+        const binaryData: ArrayBuffer = base64Decode(lasString);
+        let pointcloud = new LASPointCloud();
+
+        // We currently only render ONE pointcloud feature
+        return new Promise<void>((resolve, reject) => {
+          pointcloud.loadData(binaryData)
+            .then(() => {
+              // console.log('LASPointCloud instance:');
+              // console.dir(pointcloud);
+              pointcloud.render(this.node);
+            });
         });
-    });
+      }  // for (featureModel)
+    }  // for (layerModel)
+
+    // If we reach here, then no pointcloud features detected, so...
+    console.log('No pointcloud feature');
+    this.node.textContent = 'No pointcloud feature to display';
+    return Promise.resolve();
   }  // renderModel()
 
   private _mimeType: string;
