@@ -28,7 +28,7 @@ class TestRasterFeatures(unittest.TestCase):
         #print(data)
 
         utils.validate_model(data)
-        utils.write_model(data, 'raster_rgb.json')
+        utils.write_model(data, 'raster-rgb_model.json')
 
     def test_utm_image(self):
         filename = os.path.join(utils.data_folder, 'utm.tif')
@@ -47,7 +47,7 @@ class TestRasterFeatures(unittest.TestCase):
         #print(data)
 
         # Write model (don't need to validate again)
-        utils.write_model(data, 'raster_utm.json')
+        utils.write_model(data, 'raster-utm_model.json')
 
 if __name__ == '__main__':
     unittest.main()

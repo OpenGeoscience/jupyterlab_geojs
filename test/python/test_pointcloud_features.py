@@ -19,7 +19,7 @@ class TestPointCloudFeatures(unittest.TestCase):
 
         data = geo_map._build_data()
 
-        #utils.write_model(data, 'pointcloud_100.json')
+        utils.write_model(data, 'pointcloud_100.json')
         utils.validate_model(data)
 
         # data should contain "data" field
@@ -31,7 +31,7 @@ class TestPointCloudFeatures(unittest.TestCase):
 
         data = geo_map._build_data()
         #print(data)
-        utils.write_model(data, 'pointcloud_100.json')
+        utils.write_model(data, 'pointcloud-100_model.json')
 
     def test_las_v14(self):
         '''Test creating pointcloud feature'''

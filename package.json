@@ -34,7 +34,6 @@
     "babel-cli": "^6.26.0",
     "base64-arraybuffer": "^0.1.5",
     "geojs": "^0.16.0",
-    "jsdom": "^11.11.0",
     "react": "^16.4.0",
     "vtk.js": "^7.3.2"
   },
@@ -44,6 +43,7 @@
     "canvas-prebuilt": "^1.6.5-prerelease.1",
     "copy-webpack-plugin": "^4.5.2",
     "jasmine": "^3.1.0",
+    "jsdom": "^11.11.0",
     "json-schema-ref-parser": "^5.0.3",
     "kw-web-suite": "^6.2.0",
     "pug-cli": "^1.0.0-alpha6",

@@ -50,7 +50,7 @@ class TestBasicFeatures(unittest.TestCase):
         utils.validate_model(data)
 
         # Optionally write result to model file
-        utils.write_model(data, 'basic_features.json')
+        utils.write_model(data, 'basic-features_model.json')
 
 if __name__ == '__main__':
     unittest.main()

@@ -81,7 +81,7 @@ describe('GeoJSBuilder', () => {
   });
 
   it('should load basic features', async () => {
-    geoMap = await initGeoMap('../models/basic_features.json');
+    geoMap = await initGeoMap('../models/basic-features_model.json');
 
     let layers = geoMap.layers()
     expect(layers.length).toBe(2);
@@ -90,7 +90,7 @@ describe('GeoJSBuilder', () => {
   });
 
   it('should load raster features', async () => {
-    geoMap = await initGeoMap('../models/raster_rgb.json')
+    geoMap = await initGeoMap('../models/raster-rgb_model.json')
 
     let layers = geoMap.layers()
     expect(layers.length).toBe(2);
