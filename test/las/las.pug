@@ -6,7 +6,7 @@ html
     title LAS Test
     script(src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js")
     style.
-      body {font-family: verdana;}
+      body {font-family: "Verdana, sans-serif";}
       button, input {
         min-width: 80px;
       }
@@ -14,7 +14,7 @@ html
         margin-left: 8px;
       }
       #vtk {
-        height: 480px;
+        height: 480px !important;
       }
       h3.notify {
         color: red;
@@ -26,13 +26,24 @@ html
       div(v-if="!isDone")
         h3 LAS test
         p
-          input(:disabled="isLoaded" type="file" name="lasFile" @change="onFileChange")
-        p
-          button(:disabled="!isLoaded || isDisplayed" @click="onDisplayClick") Display
-          span.comment(v-if="pointCount > 0") Loaded binary data ({{pointCount}} points)
-        p
-          button(:disabled="!lasPointCloud" @click="onDeleteClick") Delete
-      div(v-else)
+          input(:disabled="isInput" type="file" multiple name="lasFile" @change="onFileChange")
+        div(v-if="isInput")
+          table
+            tr
+              td Input point Count
+              td {{input.pointCount}}
+            tr
+              td Input bounds
+              td {{input.bounds}}
+          p
+            button(:disabled="isDisplayed" @click="onDisplayClick") Load &amp; Display
+            span.comment(v-if="pointCount > 0") Loaded binary data ({{pointCount}} points)
+
+        div(v-if="isDisplayed")
+          p
+            button(:disabled="!lasPointCloud" @click="onDeleteClick") Delete
+
+      div(v-if="isDone")
         h3.notify Reload the page to start again.
     div#vtk
 
@@ -43,8 +54,18 @@ html
         el: '#vue',
         data: function() {
           return {
-            isDisplayed: false,
-            isDone: false,
+            // Store metadata from the user-specified files (before loading data)
+            input: {
+              files: null,    // from <input type="files">
+              bounds: null,   // [xmin,xmax, ymin,ymax, zmin,zmax]
+              formats: {},    // <point-record-format, point-count>
+              pointCount: 0,  // overall point count
+            },
+
+            // Tracks state from input to display to done
+            isInput: false,       // app has read LAS headers
+            isDisplayed: false,   // app has loaded and rendered data
+            isDone: false,        // deprecated?
             lasPointCloud: null,
             pointCount: 0,
           }
@@ -62,51 +83,106 @@ html
             this.pointCount = 0;
             console.log('Data should be deleted');
           },  // deleteLASData()
-          onDisplayClick: function() {
+          onDisplayClick: async function() {
+            // Load input files
+            this.lasPointCloud = new LASPointCloud();
+            this.lasPointCloud.setZRange(
+              this.input.bounds[4], this.input.bounds[5]);
+
+            // We cannot do these concurrently
+            // For now, use brute force to run in sequence
+            for (let f of this.input.files) {
+              await new Promise((resolve, reject) => {
+                let fileReader = new FileReader();
+                fileReader.onload = evt => {
+                  let buffer = evt.target.result;
+                  console.log(`Loaded content length ${buffer.byteLength}`);
+                  this.lasPointCloud.loadData(buffer)
+                    .then(() => resolve())
+                    .catch(err => reject(err))
+                }
+                fileReader.readAsArrayBuffer(f);
+              });  // new Promise()
+              //promiseList.push(p);
+            }  // for (f)
+
             let elem = document.querySelector('#vtk');
             this.lasPointCloud.render(elem);
             this.isDisplayed = true;
           },  // onDisplayClick()
           onFileChange: function(evt) {
-            // Todo reset point cloud?
-            //console.dir(evt.target);
+            // Parse input file headers to update this.input
+            // We can do these concurrently, because (I just know)
+            // lasPointCloud.getLASHeader() is a static method.
+            let promiseList = [];
+            this.input.files = evt.target.files;
+            for (let f of this.input.files) {
+              let p = new Promise((resolve, reject) => {
+                let fileReader = new FileReader();
+                fileReader.onload = evt => {
+                  let buffer = evt.target.result;
+                  console.log(`Input content length ${buffer.byteLength}`);
+                  LASPointCloud.getLASHeader(buffer)
+                    .then(header => resolve(header));
+                }
+                // Read enough bytes to parse the LAS public header
+                let blob = f.slice(0, 350);
+                fileReader.readAsArrayBuffer(blob);
+              });  // new Promise()
+              promiseList.push(p);
+            }  // for (f)
 
-            let files = evt.target.files;
-            if (files.length === 0) {
+            // Compute input metadata once all headers have been read
+            console.log(`promiseList ${promiseList}`);
+            Promise.all(promiseList)
+              .then(headers => {
+                console.log(headers);
+                for (let header of headers) {
+                  // Total point count
+                  this.input.pointCount += header.pointsCount;
+
+                  // Point count by point record format
+                  const format = header.pointsFormatId;
+                  let newCount = header.pointsCount;
+                  if (format in this.input.formats) {
+                    newCount += this.input.formats[format];
+                  }
+                  this.input.formats[format] = newCount;
+
+                  // And the bounds
+                  const bounds = [
+                    header.mins[0], header.maxs[0],  // xmin, xmax
+                    header.mins[1], header.maxs[1],  // ymin, ymax
+                    header.mins[2], header.maxs[2],  // zmin, zmax
+                    ]
+                  this.updateBounds(bounds);
+                }
+                //- console.log(`Input metadata: ${this.input}`);
+                //- console.dir(this.input);
+                this.isInput = true;
+              })
+              .catch(err => alert(err));
+
+
+          },  // onFileChange()
+          updateBounds: function(newBounds) {
+            if (!this.input.bounds) {
+              this.input.bounds = newBounds;
               return;
             }
-
-            // Read contents
-            let fileReader = new FileReader();
-            fileReader.onload = evt => {
-              //console.log(`result: ${evt}`);
-              //console.dir(evt);
-              let lasContent = evt.target.result;
-              console.log(`Loaded content length ${lasContent.byteLength}`);
-
-              try {
-                // console.log(`pointcloud ${pointcloud}, type ${typeof pointcloud}`);
-                // console.dir(pointcloud);
-                this.lasPointCloud = new LASPointCloud();
-                this.lasPointCloud.loadData(lasContent)
-                  .then(() => {
-                    this.pointCount = this.lasPointCloud.pointCount();
-                    console.log(`LAS point count ${this.lasPointCloud.pointCount()}`);
-                    console.log(`LAS version ${this.lasPointCloud.lasVersion()}`);
-                    console.log(`LAS point format ${this.lasPointCloud.pointFormat()}`);              
-                  });
-              }
-              catch(err) {
-                alert(err);
-                return;
+            // (else)
+            for (let i=0; i<3; ++i) {
+              let index = 2*i;
+              if (newBounds[index] < this.input.bounds[index]) {
+                this.input.bounds[index] = newBounds[index];
               }
 
-            };  // fileReader.onload()
-            fileReader.onerror = err => {
-              alert(err);
-            }
-            fileReader.readAsArrayBuffer(files[0]);
-          },  // onFileChange()
+              ++index;
+              if (newBounds[index] > this.input.bounds[index]) {
+                this.input.bounds[index] = newBounds[index];
+              }
+            }  // for (i)
+          },  // updateBounds()
         },  // methods
         computed: {
           isLoaded: function() {

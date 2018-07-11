@@ -16,7 +16,7 @@ import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
 /**
  * An object that manages a bunch of particle systems
  */
-var ParticleSystem = function(vs, fs) {
+var ParticleSystem = function() {
     this.pss = []; // particle systems in use
 
     this.mx = null;
@@ -28,6 +28,7 @@ var ParticleSystem = function(vs, fs) {
     this.in_y = null;
     this.klass = null;
     this.pointsSoFar = 0;
+    this.zrange = null;
 
     this.renderer = null;
     this.renderWindow = null;
@@ -54,22 +55,30 @@ ParticleSystem.prototype.push = function(lasBuffer) {
     cellBuffer[0] = count;
     var maxz, minz;
 
-    for ( var i = 0; i < count; i ++) {
-        p = lasBuffer.getPoint(i);
-        z = p.position[2] * lasBuffer.scale[2] +
-                    (lasBuffer.offset[2] - lasBuffer.mins[2]);
-        if (maxz === undefined) {
-            maxz = z;
-            minz = z;
-        } else {
-            if (z > maxz) {
-                maxz = z;
-            }
-            if (z < minz) {
-                minz = z;
-            }
-        }
+    if (this.zrange) {
+        minz = this.zrange[0];
+        maxz = this.zrange[1];
     }
+    else {
+        // Autoscale
+        for ( var i = 0; i < count; i ++) {
+            p = lasBuffer.getPoint(i);
+            z = p.position[2] * lasBuffer.scale[2] +
+                        (lasBuffer.offset[2] - lasBuffer.mins[2]);
+            if (maxz === undefined) {
+                maxz = z;
+                minz = z;
+            } else {
+                if (z > maxz) {
+                    maxz = z;
+                }
+                if (z < minz) {
+                    minz = z;
+                }
+            }  // (else)
+        }  // for (i)
+    }
+
 
     for ( var i = 0; i < count; i ++) {
         var p = lasBuffer.getPoint(i);
@@ -150,6 +159,17 @@ ParticleSystem.prototype.init = function(elem) {
         interactor.initialize();
         interactor.bindEvents(elem);
     }
+}
+
+/**
+ * Render particle system using vtk.js
+ */
+ParticleSystem.prototype.setZRange = function(zmin, zmax) {
+    if (!this.zrange) {
+        this.zrange = new Array(2);
+    }
+    this.zrange[0] = zmin;
+    this.zrange[1] = zmax;
 }
 
 /**
