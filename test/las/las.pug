@@ -83,32 +83,15 @@ html
             this.pointCount = 0;
             console.log('Data should be deleted');
           },  // deleteLASData()
-          onDisplayClick: async function() {
+          onDisplayClick: function() {
             // Load input files
             this.lasPointCloud = new LASPointCloud();
-            this.lasPointCloud.setZRange(
-              this.input.bounds[4], this.input.bounds[5]);
-
-            // We cannot do these concurrently
-            // For now, use brute force to run in sequence
-            for (let f of this.input.files) {
-              await new Promise((resolve, reject) => {
-                let fileReader = new FileReader();
-                fileReader.onload = evt => {
-                  let buffer = evt.target.result;
-                  console.log(`Loaded content length ${buffer.byteLength}`);
-                  this.lasPointCloud.loadData(buffer)
-                    .then(() => resolve())
-                    .catch(err => reject(err))
-                }
-                fileReader.readAsArrayBuffer(f);
-              });  // new Promise()
-              //promiseList.push(p);
-            }  // for (f)
-
-            let elem = document.querySelector('#vtk');
-            this.lasPointCloud.render(elem);
-            this.isDisplayed = true;
+            this.lasPointCloud.loadFiles(this.input.files)
+              .then(() => {
+                let elem = document.querySelector('#vtk');
+                this.lasPointCloud.render(elem);
+                this.isDisplayed = true;
+              })
           },  // onDisplayClick()
           onFileChange: function(evt) {
             // Parse input file headers to update this.input
@@ -121,7 +104,7 @@ html
                 let fileReader = new FileReader();
                 fileReader.onload = evt => {
                   let buffer = evt.target.result;
-                  console.log(`Input content length ${buffer.byteLength}`);
+                  //console.log(`Input content length ${buffer.byteLength}`);
                   LASPointCloud.getLASHeader(buffer)
                     .then(header => resolve(header));
                 }
@@ -133,10 +116,8 @@ html
             }  // for (f)
 
             // Compute input metadata once all headers have been read
-            console.log(`promiseList ${promiseList}`);
             Promise.all(promiseList)
               .then(headers => {
-                console.log(headers);
                 for (let header of headers) {
                   // Total point count
                   this.input.pointCount += header.pointsCount;

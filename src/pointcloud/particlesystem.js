@@ -56,8 +56,9 @@ ParticleSystem.prototype.push = function(lasBuffer) {
     var maxz, minz;
 
     if (this.zrange) {
-        minz = this.zrange[0];
-        maxz = this.zrange[1];
+        // Offset values by same amount as point conversion
+        minz = this.zrange[0] - lasBuffer.mins[2];
+        maxz = this.zrange[1] - lasBuffer.mins[2];
     }
     else {
         // Autoscale
