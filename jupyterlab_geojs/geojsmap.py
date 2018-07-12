@@ -4,12 +4,14 @@ import os
 from IPython.display import display, JSON
 from .geojsfeaturelayer import GeoJSFeatureLayer
 from .geojsosmlayer import GeoJSOSMLayer
+from .scenevalidator import SceneValidator
 
 # A display class that can be used in Jupyter notebooks:
 #   from jupyterlab_geojs import GeoJSMap
 #   GeoJSMap()
 
 MIME_TYPE = 'application/geojs+json'
+
 
 class GeoJSMap(JSON):
     """A display class for displaying GeoJS visualizations in the Jupyter Notebook and IPython kernel.
@@ -48,14 +50,26 @@ class GeoJSMap(JSON):
             setattr(self, name, value)
         # Todo create attributes for any kwargs not in MemberNames,
         # for forward compatibility with GeoJS
+        self._validator = SceneValidator()
+        self._validator.adding_map(self)
 
         # Internal members
         self._options = kwargs
         self._layers = list()
         self._layer_lookup = dict()  # <layer, index>
         self._logger = None
+        # Tracks the zoom & center coordinates in different representations
+        self._viewpoint = type('ViewPoint', (object,), dict())
+        self._viewpoint.mode = None
+        self._viewpoint.bounds = {
+            'left':   None,
+            'top':    None,
+            'right':  None,
+            'bottom': None
+        }
 
     def createLayer(self, layer_type, **kwargs):
+        self._validator.adding_layer(self, layer_type)
         if False: pass
         # elif layer_type == 'annotation':
         #     layer = GeoJSAnnotationLayer(**kwargs)
@@ -69,6 +83,7 @@ class GeoJSMap(JSON):
             raise Exception('Unrecognized layer type \"{}\"'.format(layerType))
 
         self._layers.append(layer)
+        self._validator.added_layer(self, layer)
         return layer
 
     def create_logger(self, folder, filename='geojsmap.log'):
@@ -87,6 +102,22 @@ class GeoJSMap(JSON):
         self._logger.addHandler(fh)
         return self._logger
 
+    def set_zoom_and_center(self, enable=True, corners=None):
+        '''Sets map zoom and center based on input args
+
+        @param enable: (boolean) command geojs to set map's zoom & center coords
+        @param corners: (list of [x,y]) bounding box specified by 4 corner points
+        '''
+        if not enable or corners is None:
+            self._viewpoint.mode = None
+        elif corners is not None:
+            self._viewpoint.mode = 'bounds'
+            x_coords,y_coords = zip(*corners)
+            self._viewpoint.bounds['left']   = min(x_coords)
+            self._viewpoint.bounds['right']  = max(x_coords)
+            self._viewpoint.bounds['top']    = max(y_coords)
+            self._viewpoint.bounds['bottom'] = min(y_coords)
+
     def _build_data(self):
         data = dict()  # return value
 
@@ -96,6 +127,13 @@ class GeoJSMap(JSON):
             if value is not None:
                 self._options[name] = value
         data['options'] = self._options
+
+        if self._viewpoint.mode is None:
+            data['viewpoint'] = None
+        else:
+            data['viewpoint'] = {'mode': self._viewpoint.mode}
+            if 'bounds' == self._viewpoint.mode:
+                data['viewpoint']['bounds'] = self._viewpoint.bounds
 
         layer_list = list()
         for layer in self._layers:
@@ -108,12 +146,16 @@ class GeoJSMap(JSON):
         if self._logger is not None:
             self._logger.debug('Enter GeoJSMap._ipython_display_()')
         data = self._build_data()
+
+        # Change mime type for "pointcloud mode"
+        mimetype = 'application/las+json' if self._validator.is_pointcloud(self) else MIME_TYPE
+
         bundle = {
-            MIME_TYPE: data,
+            mimetype: data,
             'text/plain': '<jupyterlab_geojs.GeoJSMap object>'
         }
         metadata = {
-            MIME_TYPE: self.metadata
+            mimetype: self.metadata
         }
         if self._logger is not None:
             self._logger.debug('display bundle: {}'.format(bundle))

@@ -1,7 +1,9 @@
 from .geojsfeature import GeoJSFeature
 from .geojslayer import GeoJSLayer
 from .geojsonfeature import GeoJSONFeature
+from .pointcloudfeature import PointCloudFeature
 from .rasterfeature import RasterFeature
+from .scenevalidator import SceneValidator
 
 
 class GeoJSFeatureLayer:
@@ -21,11 +23,17 @@ class GeoJSFeatureLayer:
         # Internal members
         self._options = kwargs
         self._features = list()
+        self._validator = SceneValidator()
 
     def createFeature(self, feature_type, **kwargs):
         '''API method to add features to this layer'''
-        if feature_type == 'geojson':  # special case
+        self._validator.adding_feature(self, feature_type)
+
+        # Handle special cases first
+        if feature_type == 'geojson':
             feature = GeoJSONFeature(**kwargs)
+        elif feature_type == 'pointcloud':
+            feature = PointCloudFeature(**kwargs)
         elif feature_type == 'raster':
             feature = RasterFeature(**kwargs)
         else:

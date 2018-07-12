@@ -116,7 +116,7 @@ const rendererFactory: IRenderMime.IRendererFactory = {
 };
 
 export
-const extension: IRenderMime.IExtension = {
+const GeoJSExtension: IRenderMime.IExtension = {
   id: 'jupyterlab_geojs:factory',
   rendererFactory,
   rank: 0,
@@ -136,5 +136,3 @@ const extension: IRenderMime.IExtension = {
   ]
 
 };
-
-export default extension;

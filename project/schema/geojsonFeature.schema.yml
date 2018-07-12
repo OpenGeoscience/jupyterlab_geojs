@@ -19,3 +19,5 @@ properties:
     type: string
 
 additionalProperties: false
+required:
+  - featureType

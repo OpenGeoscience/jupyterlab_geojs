@@ -18,14 +18,13 @@ properties:
     items:
       anyOf:
         - enum:
-          - choropleth
-          - contour
-          - heatmap
-          - geojson
-          - line
-          - pixelmap
+          # - choropleth
+          # - contour
+          # - heatmap
+          # - line
+          # - pixelmap
           - point
-          - polygon
+          # - polygon
           - quad
     minItems: 1
     uniqueItems: true
@@ -53,9 +52,10 @@ properties:
           required:
             - featureType
 
+        - $ref: ./binaryDataFeature.schema.yml
+        - $ref: ./geojsonFeature.schema.yml
         # $ref: ./choroplethFeature.schema
         # $ref: ./contourFeature.schema
-        - $ref: ./geojsonFeature.schema.yml
         # $ref: ./heatmapFeature.schema
         # $ref: ./lineFeature.schema
         # $ref: ./pixelMapFeature.schema

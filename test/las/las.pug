@@ -1,0 +1,173 @@
+doctype html
+html
+  head
+    meta(http-equiv="Content-type" content="text/html; charset=utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title LAS Test
+    script(src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js")
+    style.
+      body {font-family: "Verdana, sans-serif";}
+      button, input {
+        min-width: 80px;
+      }
+      span.comment {
+        margin-left: 8px;
+      }
+      #vtk {
+        height: 480px !important;
+      }
+      h3.notify {
+        color: red;
+      }
+  body
+    div#vue
+      //- Html here references vue members - messy yes, but I don't have to
+          set up a build env for vue
+      div(v-if="!isDone")
+        h3 LAS test
+        p
+          input(:disabled="isInput" type="file" multiple name="lasFile" @change="onFileChange")
+        div(v-if="isInput")
+          table
+            tr
+              td Input point Count
+              td {{input.pointCount}}
+            tr
+              td Input bounds
+              td {{input.bounds}}
+          p
+            button(:disabled="isDisplayed" @click="onDisplayClick") Load &amp; Display
+            span.comment(v-if="pointCount > 0") Loaded binary data ({{pointCount}} points)
+
+        div(v-if="isDisplayed")
+          p
+            button(:disabled="!lasPointCloud" @click="onDeleteClick") Delete
+
+      div(v-if="isDone")
+        h3.notify Reload the page to start again.
+    div#vtk
+
+    script(src="./pointcloud.bundle.js")
+    script.
+      console.log('Page loaded')
+      new Vue({
+        el: '#vue',
+        data: function() {
+          return {
+            // Store metadata from the user-specified files (before loading data)
+            input: {
+              files: null,    // from <input type="files">
+              bounds: null,   // [xmin,xmax, ymin,ymax, zmin,zmax]
+              formats: {},    // <point-record-format, point-count>
+              pointCount: 0,  // overall point count
+            },
+
+            // Tracks state from input to display to done
+            isInput: false,       // app has read LAS headers
+            isDisplayed: false,   // app has loaded and rendered data
+            isDone: false,        // deprecated?
+            lasPointCloud: null,
+            pointCount: 0,
+          }
+        },  // data
+        methods: {
+          onDeleteClick: function() {
+            this.lasPointCloud.dispose();
+
+            let vtkElement = document.querySelector('#vtk');
+            vtkElement.parentNode.removeChild(vtkElement);
+
+            this.isDisplayed = null;
+            this.isDone = true;
+            this.lasPointCloud = null;
+            this.pointCount = 0;
+            console.log('Data should be deleted');
+          },  // deleteLASData()
+          onDisplayClick: function() {
+            // Load input files
+            this.lasPointCloud = new LASPointCloud();
+            this.lasPointCloud.loadFiles(this.input.files)
+              .then(() => {
+                let elem = document.querySelector('#vtk');
+                this.lasPointCloud.render(elem);
+                this.isDisplayed = true;
+              })
+          },  // onDisplayClick()
+          onFileChange: function(evt) {
+            // Parse input file headers to update this.input
+            // We can do these concurrently, because (I just know)
+            // lasPointCloud.getLASHeader() is a static method.
+            let promiseList = [];
+            this.input.files = evt.target.files;
+            for (let f of this.input.files) {
+              let p = new Promise((resolve, reject) => {
+                let fileReader = new FileReader();
+                fileReader.onload = evt => {
+                  let buffer = evt.target.result;
+                  //console.log(`Input content length ${buffer.byteLength}`);
+                  LASPointCloud.getLASHeader(buffer)
+                    .then(header => resolve(header));
+                }
+                // Read enough bytes to parse the LAS public header
+                let blob = f.slice(0, 350);
+                fileReader.readAsArrayBuffer(blob);
+              });  // new Promise()
+              promiseList.push(p);
+            }  // for (f)
+
+            // Compute input metadata once all headers have been read
+            Promise.all(promiseList)
+              .then(headers => {
+                for (let header of headers) {
+                  // Total point count
+                  this.input.pointCount += header.pointsCount;
+
+                  // Point count by point record format
+                  const format = header.pointsFormatId;
+                  let newCount = header.pointsCount;
+                  if (format in this.input.formats) {
+                    newCount += this.input.formats[format];
+                  }
+                  this.input.formats[format] = newCount;
+
+                  // And the bounds
+                  const bounds = [
+                    header.mins[0], header.maxs[0],  // xmin, xmax
+                    header.mins[1], header.maxs[1],  // ymin, ymax
+                    header.mins[2], header.maxs[2],  // zmin, zmax
+                    ]
+                  this.updateBounds(bounds);
+                }
+                //- console.log(`Input metadata: ${this.input}`);
+                //- console.dir(this.input);
+                this.isInput = true;
+              })
+              .catch(err => alert(err));
+
+
+          },  // onFileChange()
+          updateBounds: function(newBounds) {
+            if (!this.input.bounds) {
+              this.input.bounds = newBounds;
+              return;
+            }
+            // (else)
+            for (let i=0; i<3; ++i) {
+              let index = 2*i;
+              if (newBounds[index] < this.input.bounds[index]) {
+                this.input.bounds[index] = newBounds[index];
+              }
+
+              ++index;
+              if (newBounds[index] > this.input.bounds[index]) {
+                this.input.bounds[index] = newBounds[index];
+              }
+            }  // for (i)
+          },  // updateBounds()
+        },  // methods
+        computed: {
+          isLoaded: function() {
+            return this.pointCount > 0;
+          }
+        },  // computed
+      });  // Vue()

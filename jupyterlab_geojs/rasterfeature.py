@@ -64,6 +64,48 @@ class RasterFeature(GeoJSFeature):
             self._gdal_dataset = gdal.Open(filename, gdal.GA_ReadOnly)
             assert(self._gdal_dataset)
 
+    def get_corner_points(self, as_lonlat=False):
+        '''Returns corners points of image as list of coords: [[x0,y0], ...[x3,y3]]
+
+        '''
+        if self._gdal_dataset is None:
+            raise Exception('No dataset loaded')
+
+        gt = self._gdal_dataset.GetGeoTransform()
+        if gt is None:
+            raise Exception('Cannot compute corners -- dataset has no geo transform')
+        num_cols = self._gdal_dataset.RasterXSize
+        num_rows = self._gdal_dataset.RasterYSize
+        corners = list()
+        for px in [0, num_cols]:
+            for py in [0, num_rows]:
+                x = gt[0] + px*gt[1] + py*gt[2]
+                y = gt[3] + px*gt[4] + py*gt[5]
+                corners.append([x, y])
+
+        if as_lonlat:
+            spatial_ref = osr.SpatialReference()
+            spatial_ref.ImportFromWkt(self.get_wkt_string())
+            corners = self._convert_to_lonlat(corners, spatial_ref)
+
+        return corners
+
+    def get_proj4_string(self):
+        ''''''
+        wkt = self.get_wkt_string()
+        if not wkt:
+            raise Exception('dataset missing projection info')
+        ref = osr.SpatialReference()
+        ref.ImportFromWkt(wkt)
+        proj4_string = ref.ExportToProj4()
+        return proj4_string
+
+    def get_wkt_string(self):
+        ''''''
+        if self._gdal_dataset is None:
+            raise Exception('No dataset loaded')
+        return self._gdal_dataset.GetProjection()
+
     def _build_data(self):
         '''Builds model as quad with image data'''
         data = super(RasterFeature, self)._build_data()
@@ -142,3 +184,21 @@ class RasterFeature(GeoJSFeature):
             os.remove(path)
 
         return data
+
+
+    def _convert_to_lonlat(self, points, from_spatial_ref):
+        '''Converts a list of [x,y] points to a list with [lon, lat] coords
+
+
+        '''
+        # Set up transform
+        lonlat_ref = osr.SpatialReference()
+        lonlat_ref .ImportFromEPSG(4326)
+        ref_transform = osr.CoordinateTransformation(from_spatial_ref, lonlat_ref)
+        lonlat_points = list()
+        for point in points:
+            native_x = point[0]
+            native_y = point[1]
+            x,y,z = ref_transform.TransformPoint(native_x, native_y)
+            lonlat_points.append([x, y])
+        return lonlat_points

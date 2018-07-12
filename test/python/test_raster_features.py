@@ -12,8 +12,8 @@ class TestRasterFeatures(unittest.TestCase):
         filename = os.path.join(utils.data_folder, 'rasterwithpalette.tif')
 
         geo_map = GeoJSMap()
-        geo_map.center = {'x': -76.5, 'y': 43.0};
-        geo_map.zoom = 7;
+        # geo_map.center = {'x': -76.5, 'y': 43.0};
+        # geo_map.zoom = 7;
         geo_map.createLayer('osm');
         feature_layer = geo_map.createLayer('feature', features=['quad.image'])
         quad = feature_layer.createFeature('raster', filename=filename)
@@ -21,11 +21,14 @@ class TestRasterFeatures(unittest.TestCase):
             'opacity': 0.5
         }
 
+        corners = quad.get_corner_points()
+        geo_map.set_zoom_and_center(corners=corners)
+
         data = geo_map._build_data()
         #print(data)
 
         utils.validate_model(data)
-        utils.write_model(data, 'raster_rgb.json')
+        utils.write_model(data, 'raster-rgb_model.json')
 
     def test_utm_image(self):
         filename = os.path.join(utils.data_folder, 'utm.tif')
@@ -44,7 +47,7 @@ class TestRasterFeatures(unittest.TestCase):
         #print(data)
 
         # Write model (don't need to validate again)
-        utils.write_model(data, 'raster_utm.json')
+        utils.write_model(data, 'raster-utm_model.json')
 
 if __name__ == '__main__':
     unittest.main()
