@@ -1,7 +1,8 @@
 export class LASPointCloud {
   constructor();
   dispose(): void;
-  loadData(arraybuffer: ArrayBuffer): Promise<void>;
+  loadBuffers(arraybuffers: ArrayBuffer[]): Promise<void>;
+  loadFiles(files: Blob[]): Promise<void>;
   lasVersion(): string;
   pointCount(): number;
   pointFormat(): number;

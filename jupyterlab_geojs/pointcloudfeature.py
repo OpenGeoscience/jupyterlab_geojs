@@ -7,14 +7,14 @@ from .lasutils import LASMetadata, LASParser, LASPointAttributes
 
 class PointCloudFeature(GeoJSFeature):
     ''''''
-    def __init__(self, data=None, filename=None, url=None, **kwargs):
-        if data is None and filename is None and url is None:
-            raise Exception('Missing data, filename, or url argument')
+    def __init__(self, data=None, filenames=None, url=None, **kwargs):
+        if data is None and filenames is None and url is None:
+            raise Exception('Missing data, filenames, or url argument')
 
         super(PointCloudFeature, self).__init__('pointcloud', config_options=False, **kwargs)
 
         # Input source
-        self._filename = None
+        self._filenames = None
         self._source_data = None
         self._url = None
 
@@ -23,31 +23,32 @@ class PointCloudFeature(GeoJSFeature):
 
         if data is not None:
             self._source_data = data
-        elif filename is not None:
-            self._filename = filename
-            # Check that file exists
-            if not os.path.exists(filename):
-                raise Exception('Cannot find file {}'.format(filename))
+        elif filenames is not None:
+            self._filenames = filenames
+            # Check that files exist
+            for filename in filenames:
+                if not os.path.exists(filename):
+                    raise Exception('Cannot find file {}'.format(filename))
         if url is not None:
             self._url = url
 
-        parser = LASParser()
-        if self._source_data:
-            import io
-            instream = io.BytesIO(self._source_data)
-        elif self._filename:
-            instream = open(self._filename, 'rb')
-        elif self._url:
-            raise Exception('Sorry - url input not yet supported')
+        # parser = LASParser()
+        # if self._source_data:
+        #     import io
+        #     instream = io.BytesIO(self._source_data)
+        # elif self._filenames:
+        #     instream = open(self._filename, 'rb')
+        # elif self._url:
+        #     raise Exception('Sorry - url input not yet supported')
 
-        try:
-            self._las_metadata = parser.parse(instream)
-        except Exception:
-            raise
-        finally:
-            instream.close()
+        # try:
+        #     self._las_metadata = parser.parse(instream)
+        # except Exception:
+        #     raise
+        # finally:
+        #     instream.close()
 
-        self._check_support()
+        # self._check_support()
 
         # print(self._las_metadata.header)
         # print(self._las_metadata.projection_wkt)
@@ -144,21 +145,35 @@ class PointCloudFeature(GeoJSFeature):
         # Initialize output object
         data = super(PointCloudFeature, self)._build_data()
 
-        # If source is a URL, have GeoJS download it
-        if self._url:
-            data['url'] = self._url
-            return data
+        # # If source is a URL, have GeoJS download it
+        # if self._url:
+        #     data['url'] = self._url
+        #     return data
 
-        # (else) Load point cloud here and send to client
-        if self._source_data is None:
-            with open(self._filename, 'rb') as f:
-                self._source_data = f.read()
+        # # (else) Load point cloud here and send to client
+        # if self._source_data is None:
+        #     with open(self._filename, 'rb') as f:
+        #         self._source_data = f.read()
 
-        # Encode the data
-        encoded_bytes = base64.b64encode(self._source_data)
-        # Have to decode as ascii so that Jupyter can jsonify
-        encoded_string = encoded_bytes.decode('ascii')
-        data['data'] = encoded_string
+        # # Encode the data
+        # encoded_bytes = base64.b64encode(self._source_data)
+        # # Have to decode as ascii so that Jupyter can jsonify
+        # encoded_string = encoded_bytes.decode('ascii')
+        # data['data'] = encoded_string
+
+        # Build an array of base64-encoded strings, one for each LAS file
+        las_list = list()
+        for filename in self._filenames:
+            with open(filename, 'rb') as f:
+                las_data = f.read()
+
+            encoded_bytes = base64.b64encode(las_data)
+            # Have to decode as ascii so that Jupyter can jsonify
+            encoded_string = encoded_bytes.decode('ascii')
+            las_list.append(encoded_string)
+
+        data['data'] = las_list
+        #print('las_list type {}: {}'.format(type(las_list), las_list))
         return data
 
     def _check_support(self):

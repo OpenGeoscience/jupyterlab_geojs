@@ -9,7 +9,7 @@ import { LASPointCloud } from '../lib/JUPYTERLAB_FILE_LOADER_pointcloud.bundle.j
 
 // Local interface definitions - do these need to be exported?
 export interface IFeatureModel {
-  data: string;
+  data: string[];
   featureType: string;
   options?: JSONObject;
   url?: string;
@@ -62,7 +62,7 @@ class OutputWidget extends Widget implements IRenderMime.IRenderer {
    * Render into this widget's node.
    * Current code only supports ONE pointcloud
    */
-  renderModel(model: IRenderMime.IMimeModel): Promise<void> {
+  async renderModel(model: IRenderMime.IMimeModel): Promise<void> {
     //console.log(`OutputWidget.renderModel() ${this._mimeType}`);
     //console.dir(model);
     const mapModel = model.data[this._mimeType] as any;
@@ -70,30 +70,33 @@ class OutputWidget extends Widget implements IRenderMime.IRenderer {
       console.error('mapModel missing');
     }
 
+    let pointcloud = new LASPointCloud();
+    let buffers: ArrayBuffer[] = [];
+
     let layerModels: ILayerModel[] = mapModel.layers || [];
     for (let layerModel of layerModels) {
       let featureModels: IFeatureModel[] = layerModel.features;
       for (let featureModel of featureModels) {
-        const lasString:string = featureModel.data;
-        const binaryData: ArrayBuffer = base64Decode(lasString);
-        let pointcloud = new LASPointCloud();
-
-        // We currently only render ONE pointcloud feature
-        return new Promise<void>((resolve, reject) => {
-          pointcloud.loadData(binaryData)
-            .then(() => {
-              // console.log('LASPointCloud instance:');
-              // console.dir(pointcloud);
-              pointcloud.render(this.node);
-            });
-        });
+        // console.log('featureModel:')
+        // console.dir(featureModel);
+        const lasArray: string[] = featureModel.data;
+        for (let lasString of lasArray) {
+          const binaryData: ArrayBuffer = base64Decode(lasString);
+          buffers.push(binaryData);
+        }  // lasString
       }  // for (featureModel)
     }  // for (layerModel)
-
-    // If we reach here, then no pointcloud features detected, so...
-    console.log('No pointcloud feature');
-    this.node.textContent = 'No pointcloud feature to display';
-    return Promise.resolve();
+    pointcloud.loadBuffers(buffers)
+      .then(() => {
+        if (!pointcloud.pointCount()) {
+          // If we reach here, then no pointcloud features detected, so...
+          //console.log('No pointcloud feature');
+          this.node.textContent = 'No pointcloud feature to display';
+          return Promise.resolve();
+        }
+        // (else)
+        return pointcloud.render(this.node);
+      });
   }  // renderModel()
 
   private _mimeType: string;
