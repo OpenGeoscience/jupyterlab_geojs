@@ -40,12 +40,23 @@ class GeoJSBuilder {
   // The GeoJS instance
   private _geoMap: any;
 
+  // Hard code UI layer and tooltip logic
+  private _uiLayer: any;
+  private _tooltip: any;
+  private _tooltipElem: HTMLElement;
+  private _preElem: HTMLPreElement;
+
   // Promise list used when building geojs map
   private _promiseList: Promise<void | {}>[];
 
   constructor() {
     this._geoMap = null;
     this._promiseList = null;  // for loading data
+
+    this._uiLayer = null;
+    this._tooltip = null;
+    this._tooltipElem = null;
+    this._preElem = null;
   }
 
   // Sets static var
@@ -74,6 +85,16 @@ class GeoJSBuilder {
     // Add dom node to the map options
     const mapOptions = Object.assign(options, {node: node});
     this._geoMap = geo.map(mapOptions);
+
+    // Initialize UI layer and tooltip
+    this._uiLayer = this._geoMap.createLayer('ui', {zIndex: 2});
+    this._tooltip = this._uiLayer.createWidget('dom', {position: {x: 0, y:0}});
+    this._tooltipElem = this._tooltip.canvas();
+    //this._tooltipElem.id = 'tooltip';
+    this._tooltipElem.classList.add('jp-TooltipGeoJS', 'hidden');
+    this._preElem = document.createElement('pre');
+    this._tooltipElem.appendChild(this._preElem);
+
     this.update(model);
     const viewpoint: JSONObject = model.viewpoint;
     if (viewpoint) {
@@ -154,9 +175,24 @@ class GeoJSBuilder {
           // If position array included, set position method
           if (options.position) {
             feature.position((dataItem: any, dataIndex: number) => {
-              // return options.position[dataIndex];
+              //console.debug(`dataIndex ${dataIndex}`);
+
+              // Workaround undiagnosed problem where dataIndex
+              // is sometimes undefined. It appears to be realted
+              // to mousemove events.
+              if (dataIndex === undefined) {
+                // Check for Kitware workaround
+                if ('__i' in dataItem) {
+                  //console.debug('dataItem is undefined');
+                  dataIndex = dataItem.__i;
+                }
+                else {
+                  throw Error('dataIndex is undefined ')
+                }
+              }  // if
               let positions: any = options.position;
               let position: any = positions[dataIndex];
+              // console.debug(`Position ${position}`);
               return position;
             });
           }
@@ -168,6 +204,40 @@ class GeoJSBuilder {
               feature[property](options[property]);
             }
           }
+
+          // Events - note that we must explicitly bind to "this"
+          if (featureModel.featureType === 'point' && feature.data) {
+            // Add hover/tooltip - only click seems to work
+            console.log('Adding tooltip');
+            feature.selectionAPI(true);
+              feature.geoOn(geo.event.feature.mouseon, function(evt: any) {
+                // console.debug('feature.mouseon');
+                // console.dir(evt);
+                this._tooltip.position(evt.mouse.geo);
+
+                let userData: any = evt.data;
+                delete userData.__i;
+                let jsData:string = JSON.stringify(
+                  userData, Object.keys(userData).sort(), 2);
+                this._preElem.innerHTML = jsData;
+                this._tooltipElem.classList.remove('hidden');
+              }.bind(this));
+              feature.geoOn(geo.event.feature.mouseoff, function(evt: any) {
+                //console.debug('featuremouseoff');
+                this._preElem.textContent = '';
+                this._tooltipElem.classList.add('hidden');
+              }.bind(this));
+
+              // feature.geoOn(geo.event.mouseclick, function(evt: any) {
+              //   console.log('plain mouseclick, evt:');
+              //   console.dir(evt);
+              //   // this._tooltip.position(evt.geo);
+              //   // this._tooltipElem.textContent = 'hello';
+              //   // this._tooltipElem.classList.remove('hidden');
+              // }.bind(this));
+
+              //.geoOn(geo.event.zoom, resimplifyOnZoom);
+          }  // if (options.data)
         break;
 
         default:

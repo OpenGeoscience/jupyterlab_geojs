@@ -27,7 +27,7 @@ class TestBasicFeatures(unittest.TestCase):
             {'lon': -112.0740373, 'lat': 33.4483771, 'name': "Phoenix", 'population': 1513367}
         ]
         positions = [{'x':city['lon'], 'y':city['lat']} for city in cities]
-        style = {'fillColor': 'red', 'strokeColor': 'black', 'strokeWidget': 2}
+        style = {'fillColor': 'red', 'strokeColor': 'black', 'strokeWidth': 2, 'radius': 12}
         feature_layer.createFeature('point', data=cities, position=positions, style=style)
 
         # Quad data

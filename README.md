@@ -49,7 +49,7 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 
 # Install js dependencies
-jlpm
+npm install
 # Build Typescript source
 jlpm build
 # Link your development version of the extension with JupyterLab
