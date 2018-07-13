@@ -34,6 +34,9 @@ class GeoJSFeatureLayer:
             feature = GeoJSONFeature(**kwargs)
         elif feature_type == 'pointcloud':
             feature = PointCloudFeature(**kwargs)
+        elif feature_type == 'polygon' and 'filename' in kwargs:
+            # Load shape file as geojson feature
+            feature = GeoJSONFeature(**kwargs)
         elif feature_type == 'raster':
             feature = RasterFeature(**kwargs)
         else:
