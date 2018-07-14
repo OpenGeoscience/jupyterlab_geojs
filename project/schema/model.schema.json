@@ -87,7 +87,10 @@
                         },
                         "data": {
                           "description": "A uuencoded copy of the file contents",
-                          "type": "string"
+                          "type": [
+                            "string",
+                            "array"
+                          ]
                         },
                         "url": {
                           "description": "The url for downloading the data",

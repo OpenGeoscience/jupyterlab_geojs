@@ -3,8 +3,11 @@ export class LASPointCloud {
   dispose(): void;
   loadBuffers(arraybuffers: ArrayBuffer[]): Promise<void>;
   loadFiles(files: Blob[]): Promise<void>;
-  lasVersion(): string;
+  bounds(): number[];
   pointCount(): number;
-  pointFormat(): number;
   render(elem: HTMLElement): void;
+
+  // For advanced users:
+  static getLASHeader(arraybuffer: ArrayBuffer): Promise<any>;
+  setZRange(zmin: number, zmax: number): void;
 }

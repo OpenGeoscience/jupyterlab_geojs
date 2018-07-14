@@ -35,7 +35,8 @@ class TestSceneValidator(unittest.TestCase):
         feature_layer.createFeature('point')
         filename = os.path.join(utils.data_folder, '100-points.las')
         #feature_layer.createFeature('pointcloud', filename=filename)
-        self.assertRaises(Exception, feature_layer.createFeature, 'pointcloud', filename=filename)
+        self.assertRaises(
+            Exception, feature_layer.createFeature, 'pointcloud', filename=filename)
 
     def test_point_pointcloud(self):
         '''pointcloud feature cannot be added to scene with point feature'''
@@ -54,7 +55,8 @@ class TestSceneValidator(unittest.TestCase):
         feature_layer.createFeature('pointcloud', filename=filename)
 
         #feature_layer.createFeature('pointcloud', filename=filename)
-        self.assertRaises(Exception, feature_layer.createFeature, 'pointcloud', filename=filename)
+        self.assertRaises(
+            Exception, feature_layer.createFeature, 'pointcloud', filename=filename)
 
 
 if __name__ == '__main__':

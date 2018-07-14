@@ -2,7 +2,8 @@ import { LASFile } from './laslaz'
 import { ParticleSystem } from './particlesystem'
 
 
-// Function to sequence an array of promises
+// Function to run (map) in sequence an array of
+// calls to a promise-returning function
 // https://stackoverflow.com/a/41608207
 Promise.each = async function(dataArray, fn) {
   for (const item of dataArray) await fn(item);
@@ -157,6 +158,10 @@ class LASPointCloud {
         })
     });  // new Promise()
   }  // loadData()
+
+  bounds() {
+    return this.input.bounds;
+  }
 
   pointCount() {
     return this.particleSystem.pointsSoFar;

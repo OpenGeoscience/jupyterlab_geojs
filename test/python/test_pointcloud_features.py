@@ -15,7 +15,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         feature_layer = geo_map.createLayer('feature')
         pointcloud = feature_layer.createFeature('pointcloud', filename=filename)
         self.assertEqual(pointcloud.get_point_count(), 100)
-        self.assertEqual(pointcloud.get_point_data_record_format(), 3)
+        self.assertEqual(pointcloud.get_point_data_record_formats(), {3: 100})
         self.assertEqual(pointcloud.get_point_count_by_return(), (89, 10, 1, 0, 0))
         self.assertIsNone(pointcloud.get_wkt_string())
 
