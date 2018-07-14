@@ -14,7 +14,7 @@ class GeoJSFeature:
 
     # Table of options specific to each feature type
     OptionNameTable = {
-        'point': ['position'],
+        'point': ['enableTooltip', 'position'],
         'quad': ['image', 'imageCrop', 'imageFixedScale']  # omit 'color' 'canvas', 'video'
     }
 

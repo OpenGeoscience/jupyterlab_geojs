@@ -28,7 +28,9 @@ class TestBasicFeatures(unittest.TestCase):
         ]
         positions = [{'x':city['lon'], 'y':city['lat']} for city in cities]
         style = {'fillColor': 'red', 'strokeColor': 'black', 'strokeWidth': 2, 'radius': 12}
-        feature_layer.createFeature('point', data=cities, position=positions, style=style)
+        point_feature = feature_layer.createFeature(
+            'point', data=cities, position=positions, style=style)
+        point_feature.enableTooltip = True  # adds ui layer in JS but NOT in python
 
         # Quad data
         quad = feature_layer.createFeature('quad')

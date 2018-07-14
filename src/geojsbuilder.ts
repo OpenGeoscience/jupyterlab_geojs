@@ -41,7 +41,7 @@ class GeoJSBuilder {
   private _geoMap: any;
 
   // Hard code UI layer and tooltip logic
-  private _uiLayer: any;
+  private _tooltipLayer: any;
   private _tooltip: any;
   private _tooltipElem: HTMLElement;
   private _preElem: HTMLPreElement;
@@ -53,7 +53,7 @@ class GeoJSBuilder {
     this._geoMap = null;
     this._promiseList = null;  // for loading data
 
-    this._uiLayer = null;
+    this._tooltipLayer = null;
     this._tooltip = null;
     this._tooltipElem = null;
     this._preElem = null;
@@ -85,15 +85,6 @@ class GeoJSBuilder {
     // Add dom node to the map options
     const mapOptions = Object.assign(options, {node: node});
     this._geoMap = geo.map(mapOptions);
-
-    // Initialize UI layer and tooltip
-    this._uiLayer = this._geoMap.createLayer('ui', {zIndex: 2});
-    this._tooltip = this._uiLayer.createWidget('dom', {position: {x: 0, y:0}});
-    this._tooltipElem = this._tooltip.canvas();
-    //this._tooltipElem.id = 'tooltip';
-    this._tooltipElem.classList.add('jp-TooltipGeoJS', 'hidden');
-    this._preElem = document.createElement('pre');
-    this._tooltipElem.appendChild(this._preElem);
 
     this.update(model);
     const viewpoint: JSONObject = model.viewpoint;
@@ -206,20 +197,24 @@ class GeoJSBuilder {
           }
 
           // Events - note that we must explicitly bind to "this"
-          if (featureModel.featureType === 'point' && feature.data) {
+          if (options.enableTooltip) {
             // Add hover/tooltip - only click seems to work
-            console.log('Adding tooltip');
+            this._enableTooltipDisplay();
             feature.selectionAPI(true);
               feature.geoOn(geo.event.feature.mouseon, function(evt: any) {
                 // console.debug('feature.mouseon');
                 // console.dir(evt);
                 this._tooltip.position(evt.mouse.geo);
 
-                let userData: any = evt.data;
+                // Work from a copy of the event data
+                let userData: any = Object.assign({}, evt.data);
                 delete userData.__i;
                 let jsData:string = JSON.stringify(
                   userData, Object.keys(userData).sort(), 2);
-                this._preElem.innerHTML = jsData;
+                // Strip off first and last lines (curly braces)
+                let lines: string[] = jsData.split('\n');
+                let innerLines: string[] = lines.slice(1, lines.length-1);
+                this._preElem.innerHTML = innerLines.join('\n');
                 this._tooltipElem.classList.remove('hidden');
               }.bind(this));
               feature.geoOn(geo.event.feature.mouseoff, function(evt: any) {
@@ -290,6 +285,23 @@ class GeoJSBuilder {
         })
     })  // new Promise()
   }  // _downloadGeoJSONFile()
+
+  // Initializes UI layer for tooltip display
+  _enableTooltipDisplay(): void {
+    if (this._tooltipLayer) {
+      return;
+    }
+
+    // Initialize UI layer and tooltip
+    console.log('Adding tooltip layer');
+    this._tooltipLayer = this._geoMap.createLayer('ui', {zIndex: 9999});
+    this._tooltip = this._tooltipLayer.createWidget('dom', {position: {x: 0, y:0}});
+    this._tooltipElem = this._tooltip.canvas();
+    //this._tooltipElem.id = 'tooltip';
+    this._tooltipElem.classList.add('jp-TooltipGeoJS', 'hidden');
+    this._preElem = document.createElement('pre');
+    this._tooltipElem.appendChild(this._preElem);
+  }
 
 }  // GeoJSBuilder
 
