@@ -31,10 +31,20 @@ module.exports = {
     rules: vtkRules,
   },
   plugins: [
-    new CopyWebpackPlugin([{
-      from: './src/pointcloud/index.d.ts',
-      to: 'JUPYTERLAB_FILE_LOADER_pointcloud.bundle.d.ts',
-      toType: 'file'
-    }])
-  ]
+    new CopyWebpackPlugin([
+      {
+        // See not above re JUPYTER_FILE_LOADER_ prefix
+        from: './src/pointcloud/index.d.ts',
+        to: 'JUPYTERLAB_FILE_LOADER_pointcloud.bundle.d.ts',
+        toType: 'file'
+      },
+      {
+        // Copy colormap files manually, since the aren't compiled by tsc
+        from: './src/colormap/*',
+        to: path.join(__dirname, 'lib/colormap'),
+        toType: 'dir',
+        flatten: true
+      },
+    ])  // new CopyWebpackPlugin()
+  ]  // plugins
 };
