@@ -14,14 +14,15 @@ const ColorFormat = Object.freeze({
 });
 
 class ColorMap {
-  constructor(name) {
+  constructor(colorSeriesName) {
     this.x_values = null;
     this.r_values = null;
     this.g_values = null;
     this.b_values = null;
+    this.x_range = [0.0, 1.0];  // default
 
-    if (name) {
-      this.useColorMap(name);
+    if (colorSeriesName) {
+      this.useColorSeries(colorSeriesName);
     }
   }  // constructor
 
@@ -31,13 +32,17 @@ class ColorMap {
     return ColorSeriesTable.keys();
   }
 
+  setInputRange(range) {
+    this.x_range = range;
+  }
+
   useColorSeries(name) {
-    console.log(`useColorMap(${name})`)
     if (!(name in ColorSeriesTable)) {
       throw Error(`Unrecognized colormap name ${name}`);
     }
     let values = ColorSeriesTable[name];
-    this.inputColorMap(values);
+    this.inputColorSeries(values);
+    console.log(`Using color series ${name}`);
   }
 
   inputColorSeries(values) {
@@ -51,15 +56,19 @@ class ColorMap {
         this.r_values.push(values[i][1][0]);
         this.g_values.push(values[i][1][1]);
         this.b_values.push(values[i][1][2]);
-    }  // for
-  }  // inputColorMap()
+    }  // for (i)
+  }  // inputColorSeries()
 
-  interpolateColor(x, format=ColorFormat.RGB) {
+  interpolateColor(val, format=ColorFormat.RGB) {
     if (!this.x_values) {
       //throw Error('color map not initialized');
       // Use rainbow as default color series
       this.inputColorSeries(rainbow);
     }
+
+    // Scale input value
+    let scaled = (val - this.x_range[0]) / (this.x_range[1] - this.x_range[0]);
+    let x = this.enforceBounds(scaled);
 
     // Traverse values brute force
     let i = 1;

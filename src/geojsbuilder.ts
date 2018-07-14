@@ -27,7 +27,7 @@ export interface IMapModel {
 }
 
 
-
+import { ColorFormat, ColorMap } from './colormap';
 import * as geo from 'geojs'
 console.debug(`Using geojs ${geo.version}`);
 
@@ -46,6 +46,8 @@ class GeoJSBuilder {
   private _tooltipElem: HTMLElement;
   private _preElem: HTMLPreElement;
 
+  private _colorMap: ColorMap;
+
   // Promise list used when building geojs map
   private _promiseList: Promise<void | {}>[];
 
@@ -57,6 +59,15 @@ class GeoJSBuilder {
     this._tooltip = null;
     this._tooltipElem = null;
     this._preElem = null;
+
+    this._colorMap = null;
+
+    // let colormap = new ColorMap('rainbow');
+    // for (let i=0; i<=10; ++i) {
+    //   let x:number = 0.1 * i;
+    //   let hex: string = colormap.interpolateColor(x, ColorFormat.HEX);
+    //   console.log(`${i}. ${x.toFixed(1)} => ${hex}`);
+    // }
   }
 
   // Sets static var
@@ -75,6 +86,7 @@ class GeoJSBuilder {
   // Returns PROMISE that resolves to geo.map instance
   // Note that caller is responsible for disposing the geo.map
   generate(node: HTMLElement, model: IMapModel={}): Promise<any> {
+    console.log('GeoJSBuilder.generate() input model:')
     console.dir(model);
     if (!!this._geoMap) {
       console.warn('Deleting existing GeoJS instance');
@@ -233,6 +245,43 @@ class GeoJSBuilder {
 
               //.geoOn(geo.event.zoom, resimplifyOnZoom);
           }  // if (options.data)
+
+          if (options.colormap) {
+            console.log('Using colormap');
+            if (!this._colorMap) {
+              this._colorMap = new ColorMap();
+            }
+            let colorOptions = options.colormap as JSONObject;
+            let field = colorOptions.field as string;
+            if (!field) {
+              throw Error('colormap specified without field item');
+            }
+            if ('colorseries' in colorOptions) {
+              this._colorMap.useColorSeries(colorOptions.colorseries as string);
+            }
+            if ('range' in colorOptions) {
+              this._colorMap.setInputRange(colorOptions.range as number[]);
+            }
+            // Setup fillColor function
+            feature.style({
+              fillColor: function(dataItem: any): string {
+                // console.log(`fillColor with dataItem:`);
+                // console.log(dataItem);
+                // console.log(`field: ${field}`);
+                //return '#993399';
+                let val = dataItem[field] as number;
+                // console.log(`input value ${val}`)
+                if (val) {
+                  let color: string= this._colorMap.interpolateColor(val, ColorFormat.HEX);
+                  // console.log(`color \"${color}\"`)
+                  return color;
+                }
+                // (else)
+                return 'red';
+              }.bind(this)  // fillColor
+            });  // feature.style()
+
+          }  // if (options.color)
         break;
 
         default:
