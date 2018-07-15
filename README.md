@@ -1,5 +1,7 @@
 # jupyterlab_geojs
 
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/OpenGeoscience/jupyterlab_geojs/master)
+
 A JupyterLab notebook extension for rendering geospatial
 data using the GeoJS front end library
 
