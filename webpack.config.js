@@ -38,13 +38,6 @@ module.exports = {
         to: 'JUPYTERLAB_FILE_LOADER_pointcloud.bundle.d.ts',
         toType: 'file'
       },
-      {
-        // Copy colormap files manually, since the aren't compiled by tsc
-        from: './src/colormap/*',
-        to: path.join(__dirname, 'lib/colormap'),
-        toType: 'dir',
-        flatten: true
-      },
     ])  // new CopyWebpackPlugin()
   ]  // plugins
 };

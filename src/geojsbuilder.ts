@@ -27,7 +27,7 @@ export interface IMapModel {
 }
 
 
-import { ColorFormat, ColorMap } from './colormap';
+import { ColorFormat, ColorMap } from 'colorkit';
 import * as geo from 'geojs'
 console.debug(`Using geojs ${geo.version}`);
 
