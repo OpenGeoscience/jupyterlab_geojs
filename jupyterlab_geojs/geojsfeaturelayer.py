@@ -45,6 +45,13 @@ class GeoJSFeatureLayer:
         self._features.append(feature)
         return feature
 
+    def clear(self):
+        '''Removes all features from this layer
+
+        '''
+        self._validator.clearing_layer(self)
+        del self._features[:]
+
 
     def _build_data(self):
         ''''''

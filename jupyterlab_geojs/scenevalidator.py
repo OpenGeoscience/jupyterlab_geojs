@@ -79,6 +79,19 @@ class _SceneValidator:
             else:
                 raise Exception('Cannot add non-pointcloud feature to scene containing pointcloud features')
 
+    def clearing_layer(self, layer):
+        '''Checks if layer has pointcloud feature, and resets if applicable
+
+        '''
+        map = self._layerDict[layer]
+        mode = self._mapDict[map]
+        if mode != _SceneMode.POINTCLOUD:
+            return
+
+        # Rest mode if this layer contains a (pointcloud) feature
+        if len(layer._features) == 1:
+            self._mapDict[map] = _SceneMode.UNASSIGNED
+
     def is_pointcloud(self, map):
         '''Returns boolean indicating whether specific map is pointcloud type
 
