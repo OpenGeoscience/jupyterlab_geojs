@@ -1,4 +1,5 @@
 import base64
+from operator import add
 import os
 
 from . import gdalutils
@@ -7,91 +8,99 @@ from .lasutils import LASMetadata, LASParser, LASPointAttributes
 
 class PointCloudFeature(GeoJSFeature):
     ''''''
-    def __init__(self, data=None, filenames=None, url=None, **kwargs):
-        if data is None and filenames is None and url is None:
-            raise Exception('Missing data, filenames, or url argument')
-
+    def __init__(self, filename, **kwargs):
         super(PointCloudFeature, self).__init__('pointcloud', config_options=False, **kwargs)
 
         # Input source
+        self._bounds = None          # [xmin,xmax, ymin,ymax, zmin,zmax]
         self._filenames = None
-        self._source_data = None
-        self._url = None
+        self._point_formats = dict() # <format, pointcount>
+        self._point_count = 0
+        self._point_count_by_return = [0]*5
+        self._projection_wkt = ''
 
-        # Other member data
-        self._las_metadata = LASMetadata()
+        if isinstance(filename, list):
+            self._filenames = filename
+        elif isinstance(filename, str):
+            self._filenames = [filename]
+        # Check that files exist
+        for f in self._filenames:
+            if not os.path.exists(f):
+                raise Exception('Cannot find file {}'.format(f))
 
-        if data is not None:
-            self._source_data = data
-        elif filenames is not None:
-            self._filenames = filenames
-            # Check that files exist
-            for filename in filenames:
-                if not os.path.exists(filename):
-                    raise Exception('Cannot find file {}'.format(filename))
-        if url is not None:
-            self._url = url
+        # Parse headers to initialize member data
+        parser = LASParser()
+        for i,filename in enumerate(self._filenames):
+            metadata = None
+            with open(filename, 'rb') as instream:
+                metadata = parser.parse(instream)
+                self._check_support(metadata)
 
-        # parser = LASParser()
-        # if self._source_data:
-        #     import io
-        #     instream = io.BytesIO(self._source_data)
-        # elif self._filenames:
-        #     instream = open(self._filename, 'rb')
-        # elif self._url:
-        #     raise Exception('Sorry - url input not yet supported')
+            h = metadata.header
+            if h.legacy_point_count:
+                point_count = h.legacy_point_count
+            else:
+                point_count = h.number_of_point_records
 
-        # try:
-        #     self._las_metadata = parser.parse(instream)
-        # except Exception:
-        #     raise
-        # finally:
-        #     instream.close()
+            # Update bounds
+            bounds = [h.min_x,h.max_x, h.min_y,h.max_y, h.min_z,h.max_z]
+            if self._bounds is None:
+                self._bounds = bounds
+            else:
+                for i in [0, 2, 4]:
+                    if bounds[i] < self._bounds[i]:
+                        self._bounds[i] = bounds[i]
+                for i in [1, 3, 5]:
+                    if bounds[i] > self._bounds[i]:
+                        self._bounds[i] = bounds[i]
 
-        # self._check_support()
+            # Update point formats
+            format = h.point_data_record_format
+            format_count = self._point_formats.get(format, 0)
+            self._point_formats[format] = format_count + point_count
 
-        # print(self._las_metadata.header)
-        # print(self._las_metadata.projection_wkt)
+            # Update point count
+            self._point_count += point_count
+
+            # Update point count by return
+            if h.legacy_number_of_points_by_return:
+                self._point_count_by_return = list(map(add,
+                    self._point_count_by_return,
+                    h.legacy_number_of_points_by_return))
+            else:
+                self._point_count_by_return = list(map(add,
+                    self._point_count_by_return,
+                    h.number_of_points_by_return))
+
+            # Update/check projection wkt
+            if i == 0:
+                self._projection_wkt = metadata.projection_wkt
+            elif metadata.projection_wkt != self._projection_wkt:
+                msg = ' '.join([
+                    'Project mismatch between input files.'
+                    'File {} is projection {}'.format(self._filenames[0], self._projection_wkt),
+                    'File {} is projection {}'.format(self._filenames[i], metadata.projection_wkt)
+                    ])
+                raise Exception(msg)
 
     def get_bounds(self, as_lonlat=False):
         '''Returns tuple (xmin,xmax,ymin,ymax,zmin,zmax)
 
-        Converts xy components to lon/lat if flag is set (requires gdal)
-        Returns None if required metadata not available
         '''
-        h = self._las_metadata.header
+        return tuple(self._bounds)
 
-        if as_lonlat:
-            wkt = self.get_wkt_string()
-            if wkt is None:
-                raise Exception('Cannot convert points because WKT string is None')
+    def get_point_data_record_formats(self):
+        '''Returns dictionary of <format, point_count>
 
-            # Convert xy min & max points to lon lat
-            native_points = [[h.min_x, h.min_y], [h.max_x, h.max_y]]
-            lonlat = gdalutils.convert_points_to_lonlat(native_points, wkt)
-            bounds = (lonlat[0][0],lonlat[1][0], lonlat[0][1],lonlat[1][1], h.min_z,h.max_z)
-        else:
-            bounds = (h.min_x,h.max_x, h.min_y,h.max_y, h.min_z,h.max_z)
-
-        return bounds
-
-    def get_las_header(self):
-        '''Returns unpacked struct from LAS public header
-
-        Returns None if source data is not LAS or LAZ
         '''
-        return self._las_metadata.header
-
-    def get_point_data_record_format(self):
-        ''''''
-        return self._las_metadata.header.point_data_record_format
+        return self._point_formats
 
     def get_point_attributes(self):
         '''Returns tuple of strings
 
         For LAS data, return value is based on point data record format
         '''
-        format = self._las_metadata.header.point_data_record_format
+        format = self._point_data_record_format
         # Mod by 128, because LAZ headers add 128
         # Per http://www.cs.unc.edu/~isenburg/lastools/download/laszip.pdf
         format %= 128
@@ -101,65 +110,45 @@ class PointCloudFeature(GeoJSFeature):
     def get_point_count(self):
         '''Returns unsigned long
         '''
-        h = self._las_metadata.header
-        if h.legacy_point_count:
-            return h.legacy_point_count
-        elif h.number_of_point_records:
-            return h.number_of_point_records
-        # (else)
-        return None
+        return self._point_count
 
     def get_point_count_by_return(self):
         ''' Returns standard LAS 5-tuple
 
         '''
-        h = self._las_metadata.header
-        if h.legacy_point_count:
-            return h.legacy_number_of_points_by_return
-        elif h.number_of_point_records:
-            return h.number_of_points_by_return
-        # (else)
-        return None
+        return tuple(self._point_count_by_return)
 
     def get_proj_string(self):
         '''Returns Proj4 string
 
         Requires gdal to be installed in the python environment
         '''
+        if self._projection_wkt is None:
+            return None
+        elif gdalutils.is_gdal_loaded():
+            from osgeo import osr
+            proj = osr.SpatialReference()
+            proj.ImportFromWkt(this._projection_wkt)
+            return proj.ExportToProj4()
+        else:
+            raise Exception('Cannot convert projection because GDAL not installed')
+
         return None
 
     def get_wkt_string(self):
         '''Returns coordinate system WKT
 
         '''
-        return self._las_metadata.projection_wkt
+        return self._projection_wkt
 
 
     def _build_data(self):
         '''Builds data model
 
-        Represents point cloud data as either
-          * uuencoded string
-          * download url
+        Represents point cloud data as list of uuencoded strings
         '''
         # Initialize output object
         data = super(PointCloudFeature, self)._build_data()
-
-        # # If source is a URL, have GeoJS download it
-        # if self._url:
-        #     data['url'] = self._url
-        #     return data
-
-        # # (else) Load point cloud here and send to client
-        # if self._source_data is None:
-        #     with open(self._filename, 'rb') as f:
-        #         self._source_data = f.read()
-
-        # # Encode the data
-        # encoded_bytes = base64.b64encode(self._source_data)
-        # # Have to decode as ascii so that Jupyter can jsonify
-        # encoded_string = encoded_bytes.decode('ascii')
-        # data['data'] = encoded_string
 
         # Build an array of base64-encoded strings, one for each LAS file
         las_list = list()
@@ -176,7 +165,7 @@ class PointCloudFeature(GeoJSFeature):
         #print('las_list type {}: {}'.format(type(las_list), las_list))
         return data
 
-    def _check_support(self):
+    def _check_support(self, metadata):
         '''Checks las version and point record format.
 
         Our current code does not support all versions of las files:
@@ -185,8 +174,11 @@ class PointCloudFeature(GeoJSFeature):
         * Only supports uncompressed data (not laz)
 
         '''
+        if metadata is None:
+            raise Exception('LAS Metadata missing')
+
         std_msg = 'Only LAS versions 1.0-1.3, point formats 0-3, no compression'
-        h = self._las_metadata.header
+        h = metadata.header
 
         # Only LAS file versions 1.0 - 1.3
         version_string = '{}.{}'.format(h.version_major, h.version_minor)

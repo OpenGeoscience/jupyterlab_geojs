@@ -31,10 +31,13 @@ module.exports = {
     rules: vtkRules,
   },
   plugins: [
-    new CopyWebpackPlugin([{
-      from: './src/pointcloud/index.d.ts',
-      to: 'JUPYTERLAB_FILE_LOADER_pointcloud.bundle.d.ts',
-      toType: 'file'
-    }])
-  ]
+    new CopyWebpackPlugin([
+      {
+        // See not above re JUPYTER_FILE_LOADER_ prefix
+        from: './src/pointcloud/index.d.ts',
+        to: 'JUPYTERLAB_FILE_LOADER_pointcloud.bundle.d.ts',
+        toType: 'file'
+      },
+    ])  // new CopyWebpackPlugin()
+  ]  // plugins
 };

@@ -84,9 +84,11 @@ describe('GeoJSBuilder', () => {
     geoMap = await initGeoMap('../models/basic-features_model.json');
 
     let layers = geoMap.layers()
-    expect(layers.length).toBe(2);
+    // Expect 3 layers: osm, features, tooltip
+    expect(layers.length).toBe(3);
     let layer1 = layers[1];
-    expect(layer1.features().length).toBe(2)  // 1 point feature, 1 quad feature
+    // Expect 2 features: point feature, quad feature
+    expect(layer1.features().length).toBe(2)
   });
 
   it('should load raster features', async () => {

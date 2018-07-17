@@ -21,3 +21,10 @@ div.output_subarea.output_LAS {
   padding: 0.4em 0;
   max-width: 100%;
 }
+
+.jp-TooltipGeoJS {
+  background: lightblue;
+  border-radius: 4px;
+  opacity: 0.9;
+  /*padding-right: 10px;*/
+}

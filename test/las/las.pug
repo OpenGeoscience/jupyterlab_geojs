@@ -106,7 +106,8 @@ html
                   let buffer = evt.target.result;
                   //console.log(`Input content length ${buffer.byteLength}`);
                   LASPointCloud.getLASHeader(buffer)
-                    .then(header => resolve(header));
+                    .then(header => resolve(header))
+                    .catch(err => alert(err));
                 }
                 // Read enough bytes to parse the LAS public header
                 let blob = f.slice(0, 350);

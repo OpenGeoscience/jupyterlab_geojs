@@ -33,6 +33,7 @@
     "@types/react-dom": "^16.0.6",
     "babel-cli": "^6.26.0",
     "base64-arraybuffer": "^0.1.5",
+    "colorkit": "^1.1.1",
     "geojs": "^0.16.0",
     "react": "^16.4.0",
     "vtk.js": "^7.3.2"

@@ -27,7 +27,7 @@ export interface IMapModel {
 }
 
 
-
+import { ColorFormat, ColorMap } from 'colorkit';
 import * as geo from 'geojs'
 console.debug(`Using geojs ${geo.version}`);
 
@@ -40,12 +40,34 @@ class GeoJSBuilder {
   // The GeoJS instance
   private _geoMap: any;
 
+  // Hard code UI layer and tooltip logic
+  private _tooltipLayer: any;
+  private _tooltip: any;
+  private _tooltipElem: HTMLElement;
+  private _preElem: HTMLPreElement;
+
+  private _colorMap: ColorMap;
+
   // Promise list used when building geojs map
   private _promiseList: Promise<void | {}>[];
 
   constructor() {
     this._geoMap = null;
     this._promiseList = null;  // for loading data
+
+    this._tooltipLayer = null;
+    this._tooltip = null;
+    this._tooltipElem = null;
+    this._preElem = null;
+
+    this._colorMap = null;
+
+    // let colormap = new ColorMap('rainbow');
+    // for (let i=0; i<=10; ++i) {
+    //   let x:number = 0.1 * i;
+    //   let hex: string = colormap.interpolateColor(x, ColorFormat.HEX);
+    //   console.log(`${i}. ${x.toFixed(1)} => ${hex}`);
+    // }
   }
 
   // Sets static var
@@ -64,6 +86,7 @@ class GeoJSBuilder {
   // Returns PROMISE that resolves to geo.map instance
   // Note that caller is responsible for disposing the geo.map
   generate(node: HTMLElement, model: IMapModel={}): Promise<any> {
+    console.log('GeoJSBuilder.generate() input model:')
     console.dir(model);
     if (!!this._geoMap) {
       console.warn('Deleting existing GeoJS instance');
@@ -74,6 +97,7 @@ class GeoJSBuilder {
     // Add dom node to the map options
     const mapOptions = Object.assign(options, {node: node});
     this._geoMap = geo.map(mapOptions);
+
     this.update(model);
     const viewpoint: JSONObject = model.viewpoint;
     if (viewpoint) {
@@ -154,9 +178,24 @@ class GeoJSBuilder {
           // If position array included, set position method
           if (options.position) {
             feature.position((dataItem: any, dataIndex: number) => {
-              // return options.position[dataIndex];
+              //console.debug(`dataIndex ${dataIndex}`);
+
+              // Workaround undiagnosed problem where dataIndex
+              // is sometimes undefined. It appears to be realted
+              // to mousemove events.
+              if (dataIndex === undefined) {
+                // Check for Kitware workaround
+                if ('__i' in dataItem) {
+                  //console.debug('dataItem is undefined');
+                  dataIndex = dataItem.__i;
+                }
+                else {
+                  throw Error('dataIndex is undefined ')
+                }
+              }  // if
               let positions: any = options.position;
               let position: any = positions[dataIndex];
+              // console.debug(`Position ${position}`);
               return position;
             });
           }
@@ -168,6 +207,81 @@ class GeoJSBuilder {
               feature[property](options[property]);
             }
           }
+
+          // Events - note that we must explicitly bind to "this"
+          if (options.enableTooltip) {
+            // Add hover/tooltip - only click seems to work
+            this._enableTooltipDisplay();
+            feature.selectionAPI(true);
+              feature.geoOn(geo.event.feature.mouseon, function(evt: any) {
+                // console.debug('feature.mouseon');
+                // console.dir(evt);
+                this._tooltip.position(evt.mouse.geo);
+
+                // Work from a copy of the event data
+                let userData: any = Object.assign({}, evt.data);
+                delete userData.__i;
+                let jsData:string = JSON.stringify(
+                  userData, Object.keys(userData).sort(), 2);
+                // Strip off first and last lines (curly braces)
+                let lines: string[] = jsData.split('\n');
+                let innerLines: string[] = lines.slice(1, lines.length-1);
+                this._preElem.innerHTML = innerLines.join('\n');
+                this._tooltipElem.classList.remove('hidden');
+              }.bind(this));
+              feature.geoOn(geo.event.feature.mouseoff, function(evt: any) {
+                //console.debug('featuremouseoff');
+                this._preElem.textContent = '';
+                this._tooltipElem.classList.add('hidden');
+              }.bind(this));
+
+              // feature.geoOn(geo.event.mouseclick, function(evt: any) {
+              //   console.log('plain mouseclick, evt:');
+              //   console.dir(evt);
+              //   // this._tooltip.position(evt.geo);
+              //   // this._tooltipElem.textContent = 'hello';
+              //   // this._tooltipElem.classList.remove('hidden');
+              // }.bind(this));
+
+              //.geoOn(geo.event.zoom, resimplifyOnZoom);
+          }  // if (options.data)
+
+          if (options.colormap) {
+            console.log('Using colormap');
+            if (!this._colorMap) {
+              this._colorMap = new ColorMap();
+            }
+            let colorOptions = options.colormap as JSONObject;
+            let field = colorOptions.field as string;
+            if (!field) {
+              throw Error('colormap specified without field item');
+            }
+            if ('colorseries' in colorOptions) {
+              this._colorMap.useColorSeries(colorOptions.colorseries as string);
+            }
+            if ('range' in colorOptions) {
+              this._colorMap.setInputRange(colorOptions.range as number[]);
+            }
+            // Setup fillColor function
+            feature.style({
+              fillColor: function(dataItem: any): string {
+                // console.log(`fillColor with dataItem:`);
+                // console.log(dataItem);
+                // console.log(`field: ${field}`);
+                //return '#993399';
+                let val = dataItem[field] as number;
+                // console.log(`input value ${val}`)
+                if (val) {
+                  let color: string= this._colorMap.interpolateColor(val, ColorFormat.HEX);
+                  // console.log(`color \"${color}\"`)
+                  return color;
+                }
+                // (else)
+                return 'red';
+              }.bind(this)  // fillColor
+            });  // feature.style()
+
+          }  // if (options.color)
         break;
 
         default:
@@ -220,6 +334,23 @@ class GeoJSBuilder {
         })
     })  // new Promise()
   }  // _downloadGeoJSONFile()
+
+  // Initializes UI layer for tooltip display
+  _enableTooltipDisplay(): void {
+    if (this._tooltipLayer) {
+      return;
+    }
+
+    // Initialize UI layer and tooltip
+    console.log('Adding tooltip layer');
+    this._tooltipLayer = this._geoMap.createLayer('ui', {zIndex: 9999});
+    this._tooltip = this._tooltipLayer.createWidget('dom', {position: {x: 0, y:0}});
+    this._tooltipElem = this._tooltip.canvas();
+    //this._tooltipElem.id = 'tooltip';
+    this._tooltipElem.classList.add('jp-TooltipGeoJS', 'hidden');
+    this._preElem = document.createElement('pre');
+    this._tooltipElem.appendChild(this._preElem);
+  }
 
 }  // GeoJSBuilder
 

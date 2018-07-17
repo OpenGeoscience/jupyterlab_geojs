@@ -27,8 +27,15 @@ class TestBasicFeatures(unittest.TestCase):
             {'lon': -112.0740373, 'lat': 33.4483771, 'name': "Phoenix", 'population': 1513367}
         ]
         positions = [{'x':city['lon'], 'y':city['lat']} for city in cities]
-        style = {'fillColor': 'red', 'strokeColor': 'black', 'strokeWidget': 2}
-        feature_layer.createFeature('point', data=cities, position=positions, style=style)
+        style = {'strokeColor': 'black', 'strokeWidth': 2, 'radius': 12}
+        point_feature = feature_layer.createFeature(
+            'point', data=cities, position=positions, style=style)
+        point_feature.enableTooltip = True  # adds ui layer in JS but NOT in python
+        point_feature.colormap = {
+            'colorseries': 'rainbow',
+            'field': 'lon',
+            'range': [-118.2436849, -74.0059413]
+        }
 
         # Quad data
         quad = feature_layer.createFeature('quad')

@@ -14,7 +14,7 @@ class GeoJSFeature:
 
     # Table of options specific to each feature type
     OptionNameTable = {
-        'point': ['position'],
+        'point': ['colormap', 'enableTooltip', 'position'],
         'quad': ['image', 'imageCrop', 'imageFixedScale']  # omit 'color' 'canvas', 'video'
     }
 
@@ -39,6 +39,15 @@ class GeoJSFeature:
         ''''''
         data = dict()
         data['featureType'] = self._feature_type
+
+        # Add selection workaround for points
+        if self._feature_type == 'point' \
+            and isinstance(self._options['data'], list) \
+            and len(self._options['data']) > 0 \
+            and not '__i' in self._options['data'][0]:
+
+            for i in range(len(self._options['data'])):
+                self._options['data'][i]['__i'] =i
 
         # Copy options that have been set
         for name in self._option_names:
