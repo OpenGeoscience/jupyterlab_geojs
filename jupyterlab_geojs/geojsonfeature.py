@@ -68,10 +68,10 @@ class GeoJSONFeature(GeoJSFeature):
             fc['features'].append(feature.ExportToJson(as_object=True))
         return fc
 
-    def _build_data(self):
-        data = super(GeoJSONFeature, self)._build_data()
+    def _build_display_model(self):
+        display_model = super(GeoJSONFeature, self)._build_display_model()
         if self._json_data is not None:
-            data['data'] = self._json_data
+            display_model['data'] = self._json_data
         elif self._url is not None:
-            data['url'] = self._url
-        return data
+            display_model['url'] = self._url
+        return display_model

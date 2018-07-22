@@ -118,7 +118,7 @@ class Scene(JSON):
             self._viewpoint.bounds['top']    = max(y_coords)
             self._viewpoint.bounds['bottom'] = min(y_coords)
 
-    def _build_data(self):
+    def _build_display_model(self):
         data = dict()  # return value
 
         # Copy options that have been set
@@ -137,7 +137,7 @@ class Scene(JSON):
 
         layer_list = list()
         for layer in self._layers:
-            layer_list.append(layer._build_data())
+            layer_list.append(layer._build_display_model())
         data['layers'] = layer_list
         return data
 
@@ -145,13 +145,13 @@ class Scene(JSON):
     def _ipython_display_(self):
         if self._logger is not None:
             self._logger.debug('Enter Scene._ipython_display_()')
-        data = self._build_data()
+        display_model = self._build_display_model()
 
         # Change mime type for "pointcloud mode"
         mimetype = 'application/las+json' if self._validator.is_pointcloud(self) else MIME_TYPE
 
         bundle = {
-            mimetype: data,
+            mimetype: display_model,
             'text/plain': '<jupyterlab_geojs.Scene object>'
         }
         metadata = {

@@ -15,16 +15,16 @@ class TestGeoMap(unittest.TestCase):
         scene.center = {'x': -73, 'y': 42.5}  # set option as public member
         osm_layer = scene.create_layer('osm')
         feature_layer = scene.create_layer('feature')
-        data = scene._build_data()
-        #print(data)
+        display_model = scene._build_display_model()
+        #print(display_model)
 
-        utils.validate_model(data)
+        utils.validate_model(display_model)
 
-        self.assertIsInstance(data, dict)
-        self.assertTrue('options' in data)
-        self.assertTrue('layers' in data)
+        self.assertIsInstance(display_model, dict)
+        self.assertTrue('options' in display_model)
+        self.assertTrue('layers' in display_model)
 
-        utils.write_model(data, 'basic_model.json')
+        utils.write_model(display_model, 'basic_model.json')
 
 if __name__ == '__main__':
     unittest.main()

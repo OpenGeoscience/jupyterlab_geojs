@@ -146,13 +146,13 @@ class PointCloudFeature(GeoJSFeature):
         return self._projection_wkt
 
 
-    def _build_data(self):
+    def _build_display_model(self):
         '''Builds data model
 
         Represents point cloud data as list of uuencoded strings
         '''
         # Initialize output object
-        data = super(PointCloudFeature, self)._build_data()
+        display_model = super(PointCloudFeature, self)._build_display_model()
 
         # Build an array of base64-encoded strings, one for each LAS file
         las_list = list()
@@ -165,9 +165,9 @@ class PointCloudFeature(GeoJSFeature):
             encoded_string = encoded_bytes.decode('ascii')
             las_list.append(encoded_string)
 
-        data['data'] = las_list
+        display_model['data'] = las_list
         #print('las_list type {}: {}'.format(type(las_list), las_list))
-        return data
+        return display_model
 
     def _check_support(self, metadata):
         '''Checks las version and point record format.

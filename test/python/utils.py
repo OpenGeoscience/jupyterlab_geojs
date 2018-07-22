@@ -23,22 +23,22 @@ with open(schema_file) as f:
 schema = json.loads(schema_string)
 
 
-def validate_model(data_model):
-    '''Validates input model against schema
+def validate_model(display_model):
+    '''Validates input display model against schema
 
     Raises exception if invalid
     '''
     print('validating against schema:')
-    jsonschema.validate(data_model, schema)
+    jsonschema.validate(display_model, schema)
 
 
-def write_model(data_model, filename, folder=model_folder):
-    '''Writes data model as json file
+def write_model(display_model, filename, folder=model_folder):
+    '''Writes display model as json file
 
     '''
     path = os.path.join(folder, filename)
-    data_string = json.dumps(data_model, sort_keys=True)
+    model_string = json.dumps(display_model, sort_keys=True)
     #data_string = json.dumps(data, sort_keys=True, indent=2)
     with open(path, 'w') as f:
-        f.write(data_string)
+        f.write(model_string)
         print('Wrote {}'.format(path))

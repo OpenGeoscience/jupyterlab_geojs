@@ -24,11 +24,11 @@ class TestRasterFeatures(unittest.TestCase):
         corners = quad.get_corner_points()
         scene.set_zoom_and_center(corners=corners)
 
-        data = scene._build_data()
-        #print(data)
+        display_model = scene._build_display_model()
+        #print(display_model)
 
-        utils.validate_model(data)
-        utils.write_model(data, 'raster-rgb_model.json')
+        utils.validate_model(display_model)
+        utils.write_model(display_model, 'raster-rgb_model.json')
 
     def test_utm_image(self):
         filename = os.path.join(utils.data_folder, 'utm.tif')
@@ -43,11 +43,11 @@ class TestRasterFeatures(unittest.TestCase):
             'opacity': 0.8
         }
 
-        data = scene._build_data()
-        #print(data)
+        display_model = scene._build_display_model()
+        #print(display_model)
 
-        # Write model (don't need to validate again)
-        utils.write_model(data, 'raster-utm_model.json')
+        # Write display model (don't need to validate again)
+        utils.write_model(display_model, 'raster-utm_model.json')
 
 if __name__ == '__main__':
     unittest.main()

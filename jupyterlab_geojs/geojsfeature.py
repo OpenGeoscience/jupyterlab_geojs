@@ -34,10 +34,10 @@ class GeoJSFeature:
         self._options = kwargs
         self._option_names = option_names
 
-    def _build_data(self):
+    def _build_display_model(self):
         ''''''
-        data = dict()
-        data['featureType'] = self._feature_type
+        display_model = dict()
+        display_model['featureType'] = self._feature_type
 
         # Add selection workaround for points
         if self._feature_type == 'point':
@@ -55,6 +55,6 @@ class GeoJSFeature:
             value = getattr(self, name, None)
             if value is not None:
                 self._options[name] = value
-        data['options'] = self._options
+        display_model['options'] = self._options
 
-        return data
+        return display_model

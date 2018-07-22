@@ -49,15 +49,15 @@ class TestBasicFeatures(unittest.TestCase):
             'opacity': 0.2
         }
 
-        # Build data model
-        data = scene._build_data()
-        print(data)
+        # Build display model
+        display_model = scene._build_display_model()
+        print(display_model)
 
-        # Validate data model against schema
-        utils.validate_model(data)
+        # Validate display model against schema
+        utils.validate_model(display_model)
 
         # Optionally write result to model file
-        utils.write_model(data, 'basic-features_model.json')
+        utils.write_model(display_model, 'basic-features_model.json')
 
 if __name__ == '__main__':
     unittest.main()

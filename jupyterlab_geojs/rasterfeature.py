@@ -106,10 +106,10 @@ class RasterFeature(GeoJSFeature):
             raise Exception('No dataset loaded')
         return self._gdal_dataset.GetProjection()
 
-    def _build_data(self):
+    def _build_display_model(self):
         '''Builds model as quad with image data'''
-        data = super(RasterFeature, self)._build_data()
-        options = data.get('options', {})
+        display_model = super(RasterFeature, self)._build_display_model()
+        options = display_model.get('options', {})
 
         # Set up coordinate transform to lonlat coordinates
         input_ref = osr.SpatialReference()
@@ -176,14 +176,14 @@ class RasterFeature(GeoJSFeature):
         feature_data['image'] = encoded_string
 
         options['data'] = [feature_data]
-        data['options'] = options
+        display_model['options'] = options
 
         # Remove temp files (gdal creates auxilliary file in addition to .png file)
         pattern = '{path}/{prefix}.*'.format(path=TEMP_DIR, prefix=ts)
         for path in glob.iglob(pattern):
             os.remove(path)
 
-        return data
+        return display_model
 
 
     def _convert_to_lonlat(self, points, from_spatial_ref):

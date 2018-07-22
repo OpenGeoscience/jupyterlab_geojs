@@ -37,14 +37,14 @@ class TestGeoJSONFeatures(unittest.TestCase):
         feature_layer = scene.create_layer('feature', features=['point', 'line', 'polygon'])
         feature_layer.create_feature('geojson', data=ny_polygons)
 
-        data = scene._build_data()
+        display_model = scene._build_display_model()
         #print(data)
 
-        # Validate data model against schema
-        utils.validate_model(data)
+        # Validate display model against schema
+        utils.validate_model(display_model)
 
         # Optionally write result to model file
-        utils.write_model(data, 'geojson_model.json')
+        utils.write_model(display_model, 'geojson_model.json')
 
     def test_shpfile_features(self):
         '''Test creating geojson feature from shp file'''
@@ -53,9 +53,9 @@ class TestGeoJSONFeatures(unittest.TestCase):
 
         filename = os.path.join(utils.data_folder, 'polygons.shp')
         feature = feature_layer.create_feature('polygon', filename)
-        data = scene._build_data()
-        utils.validate_model(data)
-        utils.write_model(data, 'shpfile_model.json')
+        display_model = scene._build_display_model()
+        utils.validate_model(display_model)
+        utils.write_model(display_model, 'shpfile_model.json')
 
 if __name__ == '__main__':
     unittest.main()

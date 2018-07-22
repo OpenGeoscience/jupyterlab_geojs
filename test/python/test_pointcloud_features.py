@@ -28,13 +28,13 @@ class TestPointCloudFeatures(unittest.TestCase):
         # atts = pointcloud.get_point_attributes()
         # print(atts)
 
-        data = scene._build_data()
+        display_model = scene._build_display_model()
 
-        utils.write_model(data, 'pointcloud-100_model.json')
-        utils.validate_model(data)
+        utils.write_model(display_model, 'pointcloud-100_model.json')
+        utils.validate_model(display_model)
 
         # data should contain "data" field
-        layers = data.get('layers', {})
+        layers = display_model.get('layers', {})
         features = layers[0].get('features')
         feature = features[0]
         self.assertIsNotNone(feature)
@@ -76,7 +76,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         #     self.assertAlmostEqual(lonlat_bounds[0], min_x, 6)  # lon min
         #     self.assertAlmostEqual(lonlat_bounds[3], max_y, 6)  # lat max
 
-        # data = scene._build_data()
+        # data = scene._build_display_model()
 
         # #utils.write_model(data, 'test1_4.json')
         # utils.validate_model(data)
@@ -88,7 +88,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         # self.assertIsNotNone(feature)
         # self.assertTrue('data' in feature)
 
-        # data = scene._build_data()
+        # data = scene._build_display_model()
         #print(data)
         #utils.write_model(data, 'test1_4.json')
 
