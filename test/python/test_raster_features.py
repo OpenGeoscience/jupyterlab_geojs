@@ -16,7 +16,7 @@ class TestRasterFeatures(unittest.TestCase):
         # scene.zoom = 7;
         scene.create_layer('osm');
         feature_layer = scene.create_layer('feature', features=['quad.image'])
-        quad = feature_layer.create_feature('raster', filename=filename)
+        quad = feature_layer.create_feature('raster', data=filename)
         quad.style = {
             'opacity': 0.5
         }
@@ -38,7 +38,7 @@ class TestRasterFeatures(unittest.TestCase):
         scene.zoom = 10;
         scene.create_layer('osm');
         feature_layer = scene.create_layer('feature', features=['quad.image'])
-        quad = feature_layer.create_feature('raster', filename=filename)
+        quad = feature_layer.create_feature('raster', data=filename)
         quad.style = {
             'opacity': 0.8
         }

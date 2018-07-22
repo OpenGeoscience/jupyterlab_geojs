@@ -1,4 +1,5 @@
 import logging
+import os
 import unittest
 
 logging.basicConfig(level=logging.DEBUG)
@@ -44,6 +45,17 @@ class TestGeoJSONFeatures(unittest.TestCase):
 
         # Optionally write result to model file
         utils.write_model(data, 'geojson_model.json')
+
+    def test_shpfile_features(self):
+        '''Test creating geojson feature from shp file'''
+        scene = Scene()
+        feature_layer = scene.create_layer('feature', features=['polygon'])
+
+        filename = os.path.join(utils.data_folder, 'polygons.shp')
+        feature = feature_layer.create_feature('polygon', filename)
+        data = scene._build_data()
+        utils.validate_model(data)
+        utils.write_model(data, 'shpfile_model.json')
 
 if __name__ == '__main__':
     unittest.main()

@@ -29,7 +29,7 @@ class TestBasicFeatures(unittest.TestCase):
         positions = [{'x':city['lon'], 'y':city['lat']} for city in cities]
         style = {'strokeColor': 'black', 'strokeWidth': 2, 'radius': 12}
         point_feature = feature_layer.create_feature(
-            'point', data=cities, position=positions, style=style)
+            'point', cities, position=positions, style=style)
         point_feature.enableTooltip = True  # adds ui layer in JS but NOT in python
         point_feature.colormap = {
             'colorseries': 'rainbow',
@@ -38,12 +38,12 @@ class TestBasicFeatures(unittest.TestCase):
         }
 
         # Quad data
-        quad = feature_layer.create_feature('quad')
-        quad.data = [{
+        feature_data = [{
             # Copied from http://opengeoscience.github.io/geojs/tutorials/video_on_map/
             'ul': {'x': -129.0625, 'y': 42.13468456089552},
             'lr': {'x': -100.9375, 'y': 29.348416310781797}
         }]
+        quad = feature_layer.create_feature('quad', feature_data)
         quad.style = {
             'color': 'magenta',
             'opacity': 0.2

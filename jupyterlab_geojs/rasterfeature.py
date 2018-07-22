@@ -38,23 +38,23 @@ class RasterFeature(GeoJSFeature):
     @param data GDALDataset
     @param filename string
     '''
-    def __init__(self, data=None, filename=None, **kwargs):
+    def __init__(self, data, **kwargs):
         ''''''
+        self._gdal_dataset = None
+
         if not HAS_GDAL:
             raise Exception('Cannot create raster features -- GDAL not installed')
 
-        if data is None and filename is None:
-            raise Exception('Missing data or filename parameter -- one must be provided')
-
         # Model raster dataset as geojs quad feature with png image
         super(RasterFeature, self).__init__('quad', **kwargs)
-        self._gdal_dataset = None
 
-        if data is not None:
-            if not isinstance(self._gdal_dataset, gdal.Dataset):
-                raise Exception('Error - input data is not gdal.Dataset')
-            self._data = data
-        elif filename is not None:
+        # Determine if input data is GDAL dataset or filename
+        if isinstance(data, gdal.Dataset):
+            self._gdal_dataset = data
+        elif isinstance(data, str):
+            # For now presume it is a file/path (no url support)
+            filename = data
+
             # Load data here, because javascript cannot load from
             # local filesystem due to browser security restriction.
             if not os.path.exists(filename):

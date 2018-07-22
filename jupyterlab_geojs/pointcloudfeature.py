@@ -8,7 +8,7 @@ from .lasutils import LASMetadata, LASParser, LASPointAttributes
 
 class PointCloudFeature(GeoJSFeature):
     ''''''
-    def __init__(self, filename, **kwargs):
+    def __init__(self, data, **kwargs):
         super(PointCloudFeature, self).__init__('pointcloud', config_options=False, **kwargs)
 
         # Input source
@@ -19,10 +19,14 @@ class PointCloudFeature(GeoJSFeature):
         self._point_count_by_return = [0]*5
         self._projection_wkt = ''
 
-        if isinstance(filename, list):
-            self._filenames = filename
-        elif isinstance(filename, str):
-            self._filenames = [filename]
+        # Note: this version of the feature only supports filename inputs,
+        # not raw data or network url's
+        if isinstance(data, list):
+            self._filenames = data
+        elif isinstance(data, str):
+            self._filenames = [data]
+        else:
+            raise Exception('Input data is not list or string: {}'.format(data))
         # Check that files exist
         for f in self._filenames:
             if not os.path.exists(f):

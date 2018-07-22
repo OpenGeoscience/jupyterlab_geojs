@@ -25,22 +25,23 @@ class GeoJSFeatureLayer:
         self._features = list()
         self._validator = SceneValidator()
 
-    def create_feature(self, feature_type, **kwargs):
+    def create_feature(self, feature_type, data, **kwargs):
         '''API method to add features to this layer'''
         self._validator.adding_feature(self, feature_type)
 
         # Handle special cases first
         if feature_type == 'geojson':
-            feature = GeoJSONFeature(**kwargs)
+            feature = GeoJSONFeature(data, **kwargs)
         elif feature_type == 'pointcloud':
-            feature = PointCloudFeature(**kwargs)
-        elif feature_type == 'polygon' and 'filename' in kwargs:
-            # Load shape file as geojson feature
-            feature = GeoJSONFeature(**kwargs)
+            feature = PointCloudFeature(data, **kwargs)
+        elif feature_type == 'polygon' and isinstance(data, str):
+            # Special case: polygon with string data represents shp file
+            # Load shp file as geojson feature
+            feature = GeoJSONFeature(data, **kwargs)
         elif feature_type == 'raster':
-            feature = RasterFeature(**kwargs)
+            feature = RasterFeature(data, **kwargs)
         else:
-            feature = GeoJSFeature(feature_type, **kwargs)
+            feature = GeoJSFeature(feature_type, data=data, **kwargs)
 
         self._features.append(feature)
         return feature

@@ -13,7 +13,7 @@ class TestPointCloudFeatures(unittest.TestCase):
 
         scene = Scene()
         feature_layer = scene.create_layer('feature')
-        pointcloud = feature_layer.create_feature('pointcloud', filename=filename)
+        pointcloud = feature_layer.create_feature('pointcloud', data=filename)
         self.assertEqual(pointcloud.get_point_count(), 100)
         self.assertEqual(pointcloud.get_point_data_record_formats(), {3: 100})
         self.assertEqual(pointcloud.get_point_count_by_return(), (89, 10, 1, 0, 0))
