@@ -25,7 +25,7 @@ class GeoJSFeatureLayer:
         self._features = list()
         self._validator = SceneValidator()
 
-    def createFeature(self, feature_type, **kwargs):
+    def create_feature(self, feature_type, **kwargs):
         '''API method to add features to this layer'''
         self._validator.adding_feature(self, feature_type)
 

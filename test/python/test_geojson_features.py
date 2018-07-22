@@ -32,9 +32,9 @@ class TestGeoJSONFeatures(unittest.TestCase):
         scene = Scene()
         scene.center = {'x': -76.5, 'y': 43.0};
         scene.zoom = 7;
-        scene.createLayer('osm', renderer='canvas');
-        feature_layer = scene.createLayer('feature', features=['point', 'line', 'polygon'])
-        feature_layer.createFeature('geojson', data=ny_polygons)
+        scene.create_layer('osm', renderer='canvas');
+        feature_layer = scene.create_layer('feature', features=['point', 'line', 'polygon'])
+        feature_layer.create_feature('geojson', data=ny_polygons)
 
         data = scene._build_data()
         #print(data)

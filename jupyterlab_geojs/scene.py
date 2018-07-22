@@ -68,7 +68,7 @@ class Scene(JSON):
             'bottom': None
         }
 
-    def createLayer(self, layer_type, **kwargs):
+    def create_layer(self, layer_type, **kwargs):
         self._validator.adding_layer(self, layer_type)
         if False: pass
         # elif layer_type == 'annotation':

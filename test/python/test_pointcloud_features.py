@@ -12,8 +12,8 @@ class TestPointCloudFeatures(unittest.TestCase):
         filename = os.path.join(utils.data_folder, '100-points.las')
 
         scene = Scene()
-        feature_layer = scene.createLayer('feature')
-        pointcloud = feature_layer.createFeature('pointcloud', filename=filename)
+        feature_layer = scene.create_layer('feature')
+        pointcloud = feature_layer.create_feature('pointcloud', filename=filename)
         self.assertEqual(pointcloud.get_point_count(), 100)
         self.assertEqual(pointcloud.get_point_data_record_formats(), {3: 100})
         self.assertEqual(pointcloud.get_point_count_by_return(), (89, 10, 1, 0, 0))
@@ -49,10 +49,10 @@ class TestPointCloudFeatures(unittest.TestCase):
         self.assertGreater(len(data), 30000)  # (sanity check)
 
         scene = Scene()
-        feature_layer = scene.createLayer('feature')
+        feature_layer = scene.create_layer('feature')
 
-        #pointcloud = feature_layer.createFeature('pointcloud', data=data)
-        self.assertRaises(Exception, feature_layer.createFeature, 'pointcloud', data=data)
+        #pointcloud = feature_layer.create_feature('pointcloud', data=data)
+        self.assertRaises(Exception, feature_layer.create_feature, 'pointcloud', data=data)
 
         # self.assertEqual(pointcloud.get_point_count(), 1000)
         # self.assertEqual(pointcloud.get_point_count_by_return(), (974, 23, 2, 1, 0))

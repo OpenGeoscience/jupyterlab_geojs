@@ -13,8 +13,8 @@ class TestGeoMap(unittest.TestCase):
         '''Test creating simple map with osm and feature layer'''
         scene = Scene(zoom=10)  # pass in option to constructor
         scene.center = {'x': -73, 'y': 42.5}  # set option as public member
-        osm_layer = scene.createLayer('osm')
-        feature_layer = scene.createLayer('feature')
+        osm_layer = scene.create_layer('osm')
+        feature_layer = scene.create_layer('feature')
         data = scene._build_data()
         #print(data)
 

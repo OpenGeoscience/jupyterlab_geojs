@@ -14,8 +14,8 @@ class TestBasicFeatures(unittest.TestCase):
         scene = Scene(zoom=10)  # pass in option to constructor
         scene.center = {'x': -97.67, 'y': 31.80}  # set option as public member
         scene.zoom = 4
-        osm_layer = scene.createLayer('osm')
-        feature_layer = scene.createLayer('feature', features=['point', 'quad'])
+        osm_layer = scene.create_layer('osm')
+        feature_layer = scene.create_layer('feature', features=['point', 'quad'])
 
         # Point data
         cities = [
@@ -28,7 +28,7 @@ class TestBasicFeatures(unittest.TestCase):
         ]
         positions = [{'x':city['lon'], 'y':city['lat']} for city in cities]
         style = {'strokeColor': 'black', 'strokeWidth': 2, 'radius': 12}
-        point_feature = feature_layer.createFeature(
+        point_feature = feature_layer.create_feature(
             'point', data=cities, position=positions, style=style)
         point_feature.enableTooltip = True  # adds ui layer in JS but NOT in python
         point_feature.colormap = {
@@ -38,7 +38,7 @@ class TestBasicFeatures(unittest.TestCase):
         }
 
         # Quad data
-        quad = feature_layer.createFeature('quad')
+        quad = feature_layer.create_feature('quad')
         quad.data = [{
             # Copied from http://opengeoscience.github.io/geojs/tutorials/video_on_map/
             'ul': {'x': -129.0625, 'y': 42.13468456089552},

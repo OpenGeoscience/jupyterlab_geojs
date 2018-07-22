@@ -14,9 +14,9 @@ class TestRasterFeatures(unittest.TestCase):
         scene = Scene()
         # scene.center = {'x': -76.5, 'y': 43.0};
         # scene.zoom = 7;
-        scene.createLayer('osm');
-        feature_layer = scene.createLayer('feature', features=['quad.image'])
-        quad = feature_layer.createFeature('raster', filename=filename)
+        scene.create_layer('osm');
+        feature_layer = scene.create_layer('feature', features=['quad.image'])
+        quad = feature_layer.create_feature('raster', filename=filename)
         quad.style = {
             'opacity': 0.5
         }
@@ -36,9 +36,9 @@ class TestRasterFeatures(unittest.TestCase):
         scene = Scene()
         scene.center = {'x': -74.5, 'y': 6.0};
         scene.zoom = 10;
-        scene.createLayer('osm');
-        feature_layer = scene.createLayer('feature', features=['quad.image'])
-        quad = feature_layer.createFeature('raster', filename=filename)
+        scene.create_layer('osm');
+        feature_layer = scene.create_layer('feature', features=['quad.image'])
+        quad = feature_layer.create_feature('raster', filename=filename)
         quad.style = {
             'opacity': 0.8
         }
