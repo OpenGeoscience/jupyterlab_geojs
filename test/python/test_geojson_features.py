@@ -4,7 +4,7 @@ import unittest
 logging.basicConfig(level=logging.DEBUG)
 
 from . import utils
-from jupyterlab_geojs import GeoJSMap
+from jupyterlab_geojs import Scene
 
 ny_polygons = { "type": "Feature",
   "geometry": {
@@ -29,14 +29,14 @@ class TestGeoJSONFeatures(unittest.TestCase):
 
     def test_geojson_features(self):
         '''Test creating geojson features'''
-        geo_map = GeoJSMap()
-        geo_map.center = {'x': -76.5, 'y': 43.0};
-        geo_map.zoom = 7;
-        geo_map.createLayer('osm', renderer='canvas');
-        feature_layer = geo_map.createLayer('feature', features=['point', 'line', 'polygon'])
+        scene = Scene()
+        scene.center = {'x': -76.5, 'y': 43.0};
+        scene.zoom = 7;
+        scene.createLayer('osm', renderer='canvas');
+        feature_layer = scene.createLayer('feature', features=['point', 'line', 'polygon'])
         feature_layer.createFeature('geojson', data=ny_polygons)
 
-        data = geo_map._build_data()
+        data = scene._build_data()
         #print(data)
 
         # Validate data model against schema

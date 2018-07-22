@@ -1,5 +1,5 @@
 class GeoJSFeature:
-    '''Generic/base class for map features
+    '''Generic/base class for GeoJS features
     '''
 
     # List of options that are common to all GoeJS features

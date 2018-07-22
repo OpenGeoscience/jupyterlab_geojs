@@ -16,10 +16,10 @@ data using the GeoJS front end library
 To render GeoJS output in JupyterLab:
 
 ```python
-from jupyterlab_geojs import GeoJSMap
-geomap = GeoJSMap()
-geomap.createLayer('osm')
-geomap
+from jupyterlab_geojs import Scene
+scene = Scene()
+scene.createLayer('osm')
+scene
 
 ```
 

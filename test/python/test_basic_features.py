@@ -4,18 +4,18 @@ import unittest
 logging.basicConfig(level=logging.DEBUG)
 
 from . import utils
-from jupyterlab_geojs import GeoJSMap
+from jupyterlab_geojs import Scene
 
 
 class TestBasicFeatures(unittest.TestCase):
 
     def test_quad_feature(self):
         '''Test creating simple map with osm and feature layer'''
-        geo_map = GeoJSMap(zoom=10)  # pass in option to constructor
-        geo_map.center = {'x': -97.67, 'y': 31.80}  # set option as public member
-        geo_map.zoom = 4
-        osm_layer = geo_map.createLayer('osm')
-        feature_layer = geo_map.createLayer('feature', features=['point', 'quad'])
+        scene = Scene(zoom=10)  # pass in option to constructor
+        scene.center = {'x': -97.67, 'y': 31.80}  # set option as public member
+        scene.zoom = 4
+        osm_layer = scene.createLayer('osm')
+        feature_layer = scene.createLayer('feature', features=['point', 'quad'])
 
         # Point data
         cities = [
@@ -50,7 +50,7 @@ class TestBasicFeatures(unittest.TestCase):
         }
 
         # Build data model
-        data = geo_map._build_data()
+        data = scene._build_data()
         print(data)
 
         # Validate data model against schema

@@ -2,7 +2,7 @@ import os
 import unittest
 
 from . import utils
-from jupyterlab_geojs import GeoJSMap, gdalutils
+from jupyterlab_geojs import Scene, gdalutils
 
 
 class TestPointCloudFeatures(unittest.TestCase):
@@ -11,8 +11,8 @@ class TestPointCloudFeatures(unittest.TestCase):
         '''Test creating pointcloud feature'''
         filename = os.path.join(utils.data_folder, '100-points.las')
 
-        geo_map = GeoJSMap()
-        feature_layer = geo_map.createLayer('feature')
+        scene = Scene()
+        feature_layer = scene.createLayer('feature')
         pointcloud = feature_layer.createFeature('pointcloud', filename=filename)
         self.assertEqual(pointcloud.get_point_count(), 100)
         self.assertEqual(pointcloud.get_point_data_record_formats(), {3: 100})
@@ -28,7 +28,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         # atts = pointcloud.get_point_attributes()
         # print(atts)
 
-        data = geo_map._build_data()
+        data = scene._build_data()
 
         utils.write_model(data, 'pointcloud-100_model.json')
         utils.validate_model(data)
@@ -48,8 +48,8 @@ class TestPointCloudFeatures(unittest.TestCase):
             data = f.read()
         self.assertGreater(len(data), 30000)  # (sanity check)
 
-        geo_map = GeoJSMap()
-        feature_layer = geo_map.createLayer('feature')
+        scene = Scene()
+        feature_layer = scene.createLayer('feature')
 
         #pointcloud = feature_layer.createFeature('pointcloud', data=data)
         self.assertRaises(Exception, feature_layer.createFeature, 'pointcloud', data=data)
@@ -76,7 +76,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         #     self.assertAlmostEqual(lonlat_bounds[0], min_x, 6)  # lon min
         #     self.assertAlmostEqual(lonlat_bounds[3], max_y, 6)  # lat max
 
-        # data = geo_map._build_data()
+        # data = scene._build_data()
 
         # #utils.write_model(data, 'test1_4.json')
         # utils.validate_model(data)
@@ -88,7 +88,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         # self.assertIsNotNone(feature)
         # self.assertTrue('data' in feature)
 
-        # data = geo_map._build_data()
+        # data = scene._build_data()
         #print(data)
         #utils.write_model(data, 'test1_4.json')
 

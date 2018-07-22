@@ -6,14 +6,14 @@ from . import utils
 
 logging.basicConfig(level=logging.DEBUG)
 
-from jupyterlab_geojs import GeoJSMap
+from jupyterlab_geojs import Scene
 
 
 class TestSceneValidator(unittest.TestCase):
 
     def test_pointcloud_osm(self):
         '''pointcloud cannot be used in scene with osm layer'''
-        scene = GeoJSMap()
+        scene = Scene()
         scene.createLayer('osm')
         feature_layer = scene.createLayer('feature')
         filename = os.path.join(utils.data_folder, '100-points.las')
@@ -22,7 +22,7 @@ class TestSceneValidator(unittest.TestCase):
 
     def test_osm_pointcloud(self):
         '''osm layer cannot be added to scene with pointcloud feature'''
-        scene = GeoJSMap()
+        scene = Scene()
         feature_layer = scene.createLayer('feature')
         filename = os.path.join(utils.data_folder, '100-points.las')
         feature_layer.createFeature('pointcloud', filename=filename)
@@ -30,7 +30,7 @@ class TestSceneValidator(unittest.TestCase):
 
     def test_pointcloud_point(self):
         '''pointcloud cannot be used in scene with point feature'''
-        scene = GeoJSMap()
+        scene = Scene()
         feature_layer = scene.createLayer('feature')
         feature_layer.createFeature('point')
         filename = os.path.join(utils.data_folder, '100-points.las')
@@ -40,7 +40,7 @@ class TestSceneValidator(unittest.TestCase):
 
     def test_point_pointcloud(self):
         '''pointcloud feature cannot be added to scene with point feature'''
-        scene = GeoJSMap()
+        scene = Scene()
         feature_layer = scene.createLayer('feature')
         filename = os.path.join(utils.data_folder, '100-points.las')
         feature_layer.createFeature('pointcloud', filename=filename)
@@ -49,7 +49,7 @@ class TestSceneValidator(unittest.TestCase):
 
     def test_pointcloud_pointcloud(self):
         '''only one pointcloud feature cannot be added to scene'''
-        scene = GeoJSMap()
+        scene = Scene()
         feature_layer = scene.createLayer('feature')
         filename = os.path.join(utils.data_folder, '100-points.las')
         feature_layer.createFeature('pointcloud', filename=filename)

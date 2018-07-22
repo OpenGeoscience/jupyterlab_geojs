@@ -122,7 +122,7 @@ const GeoJSExtension: IRenderMime.IExtension = {
   rank: 0,
   dataType: 'json',
   documentWidgetFactoryOptions: {
-    name: 'GeoJSMap',
+    name: 'GeoJS',
     primaryFileType: 'geojson',
     fileTypes: ['geojson'],
     defaultFor: []

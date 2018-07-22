@@ -7,16 +7,16 @@ from .geojsosmlayer import GeoJSOSMLayer
 from .scenevalidator import SceneValidator
 
 # A display class that can be used in Jupyter notebooks:
-#   from jupyterlab_geojs import GeoJSMap
-#   GeoJSMap()
+#   from jupyterlab_geojs import Scene
+#   Scene()
 
 MIME_TYPE = 'application/geojs+json'
 
 
-class GeoJSMap(JSON):
+class Scene(JSON):
     """A display class for displaying GeoJS visualizations in the Jupyter Notebook and IPython kernel.
 
-    GeoJSMap expects a JSON-able dict, not serialized JSON strings.
+    Scene expects a JSON-able dict, not serialized JSON strings.
 
     Scalar types (None, number, string) are not allowed, only dict containers.
     """
@@ -43,7 +43,7 @@ class GeoJSMap(JSON):
     def __init__(self, **kwargs):
         '''
         '''
-        super(GeoJSMap, self).__init__()
+        super(Scene, self).__init__()
         # Public members
         for name in self.__class__.OptionNames:
             value = kwargs.get(name)
@@ -86,7 +86,7 @@ class GeoJSMap(JSON):
         self._validator.added_layer(self, layer)
         return layer
 
-    def create_logger(self, folder, filename='geojsmap.log'):
+    def create_logger(self, folder, filename='scene.log'):
         '''Initialize logger with file handler
 
         @param folder (string) directory to store logfile
@@ -144,7 +144,7 @@ class GeoJSMap(JSON):
 
     def _ipython_display_(self):
         if self._logger is not None:
-            self._logger.debug('Enter GeoJSMap._ipython_display_()')
+            self._logger.debug('Enter Scene._ipython_display_()')
         data = self._build_data()
 
         # Change mime type for "pointcloud mode"
@@ -152,7 +152,7 @@ class GeoJSMap(JSON):
 
         bundle = {
             mimetype: data,
-            'text/plain': '<jupyterlab_geojs.GeoJSMap object>'
+            'text/plain': '<jupyterlab_geojs.Scene object>'
         }
         metadata = {
             mimetype: self.metadata
