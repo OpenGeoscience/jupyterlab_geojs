@@ -5,6 +5,7 @@ from IPython.display import display, JSON
 from .geojsfeaturelayer import GeoJSFeatureLayer
 from .geojsosmlayer import GeoJSOSMLayer
 from .scenevalidator import SceneValidator
+from .types import LayerType
 
 # A display class that can be used in Jupyter notebooks:
 #   from jupyterlab_geojs import Scene
@@ -73,9 +74,9 @@ class Scene(JSON):
         if False: pass
         # elif layer_type == 'annotation':
         #     layer = GeoJSAnnotationLayer(**kwargs)
-        elif layer_type == 'feature':
+        elif layer_type == LayerType.FEATURE:
             layer = GeoJSFeatureLayer(**kwargs)
-        elif layer_type == 'osm':
+        elif layer_type == LayerType.OSM:
             layer = GeoJSOSMLayer(**kwargs)
         # elif layer_type == 'ui':
         #     layer = GeoJSUILayer(**kwargs)

@@ -4,6 +4,7 @@ from .geojsonfeature import GeoJSONFeature
 from .pointcloudfeature import PointCloudFeature
 from .rasterfeature import RasterFeature
 from .scenevalidator import SceneValidator
+from .types import FeatureType
 
 
 class GeoJSFeatureLayer:
@@ -30,15 +31,15 @@ class GeoJSFeatureLayer:
         self._validator.adding_feature(self, feature_type)
 
         # Handle special cases first
-        if feature_type == 'geojson':
+        if feature_type == FeatureType.GEOJSON:
             feature = GeoJSONFeature(data, **kwargs)
-        elif feature_type == 'pointcloud':
+        elif feature_type == FeatureType.POINTCLOUD:
             feature = PointCloudFeature(data, **kwargs)
-        elif feature_type == 'polygon' and isinstance(data, str):
+        elif feature_type == FeatureType.POLYGON and isinstance(data, str):
             # Special case: polygon with string data represents shp file
             # Load shp file as geojson feature
             feature = GeoJSONFeature(data, **kwargs)
-        elif feature_type == 'raster':
+        elif feature_type == FeatureType.RASTER:
             feature = RasterFeature(data, **kwargs)
         else:
             feature = GeoJSFeature(feature_type, data=data, **kwargs)

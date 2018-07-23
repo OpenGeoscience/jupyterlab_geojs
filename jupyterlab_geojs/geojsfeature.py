@@ -39,7 +39,10 @@ class GeoJSFeature:
         display_model = dict()
         display_model['featureType'] = self._feature_type
 
-        # Add selection workaround for points
+        # Add array index to point features, because it:
+        #   - provides a selection workaround for points
+        #   - is used in client for options specified by function
+        # Should this index be added to all feature types?
         if self._feature_type == 'point':
             point_data = self._options.get('data')
             if isinstance(point_data, list) \
@@ -72,7 +75,7 @@ class GeoJSFeature:
                 item_vals = [val(item) for item in data]
 
                 # Check format for styles that set color
-                if key in ['fillColor']:
+                if key in ['backgroundColor', 'color', 'fillColor', 'strokeColor']:
                     item_vals = self._format_colors(item_vals)
                 style[key] = item_vals
 

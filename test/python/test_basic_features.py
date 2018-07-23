@@ -13,7 +13,7 @@ print('matplotlib loaded? {}'.format(MPL_LOADED))
 logging.basicConfig(level=logging.DEBUG)
 
 from . import utils
-from jupyterlab_geojs import Scene
+from jupyterlab_geojs import Scene, LayerType, FeatureType
 
 
 class TestBasicFeatures(unittest.TestCase):
@@ -23,8 +23,9 @@ class TestBasicFeatures(unittest.TestCase):
         scene = Scene(zoom=10)  # pass in option to constructor
         scene.center = {'x': -97.67, 'y': 31.80}  # set option as public member
         scene.zoom = 4
-        osm_layer = scene.create_layer('osm')
-        feature_layer = scene.create_layer('feature', features=['point', 'quad'])
+        osm_layer = scene.create_layer(LayerType.OSM)
+        feature_layer = scene.create_layer(
+            LayerType.FEATURE, features=[FeatureType.POINT, FeatureType.QUAD])
 
         # Point data
         cities = [
@@ -48,7 +49,7 @@ class TestBasicFeatures(unittest.TestCase):
         style['radius'] = lambda city: int(math.sqrt(rmin*rmin*city['population']/pmin))
 
         point_feature = feature_layer.create_feature(
-            'point', cities, position=position, style=style)
+            FeatureType.POINT, cities, position=position, style=style)
         point_feature.enableTooltip = True  # adds ui layer in JS but NOT in python
 
         # Apply colormap to longitude
@@ -72,7 +73,7 @@ class TestBasicFeatures(unittest.TestCase):
             'ul': {'x': -129.0625, 'y': 42.13468456089552},
             'lr': {'x': -100.9375, 'y': 29.348416310781797}
         }]
-        quad = feature_layer.create_feature('quad', feature_data)
+        quad = feature_layer.create_feature(FeatureType.QUAD, feature_data)
         quad.style = {
             'color': 'magenta',
             'opacity': 0.2
