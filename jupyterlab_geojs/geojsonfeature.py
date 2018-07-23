@@ -19,7 +19,7 @@ class GeoJSONFeature(GeoJSFeature):
             if not bool(parsed_url.scheme):
                 # If not scheme, then we presume it is a file/path
                 filename = data
-            elif parsed_url.shceme == 'file':
+            elif parsed_url.scheme == 'file':
                 # If scheme is a file, strip the scheme and use the rest as file/path
                 n = len('file://')
                 filename = data[n:]
