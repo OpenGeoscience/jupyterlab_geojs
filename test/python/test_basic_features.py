@@ -2,6 +2,14 @@ import logging
 import math
 import unittest
 
+try:
+    import matplotlib as mpl
+    import matplotlib.cm
+    MPL_LOADED = True
+except ImportError:
+    MPL_LOADED = False
+print('matplotlib loaded? {}'.format(MPL_LOADED))
+
 logging.basicConfig(level=logging.DEBUG)
 
 from . import utils
@@ -35,21 +43,28 @@ class TestBasicFeatures(unittest.TestCase):
         # Use lambda function to set point radius
         populations = [city['population'] for city in cities]
         pmin = min(populations)
-        # pmax = max(populations)
-        # pdiff = pmax - pmin
-        # pscale = lambda city: (city['population'] - pmin) / pdiff
-        # Scale area proportional to population ratio
+        # Scale area proportional to population
         rmin = 8  # minimum radius
         style['radius'] = lambda city: int(math.sqrt(rmin*rmin*city['population']/pmin))
 
         point_feature = feature_layer.create_feature(
             'point', cities, position=position, style=style)
         point_feature.enableTooltip = True  # adds ui layer in JS but NOT in python
-        point_feature.colormap = {
-            'colorseries': 'rainbow',
-            'field': 'lon',
-            'range': [-118.2436849, -74.0059413]
-        }
+
+        # Apply colormap to longitude
+        if MPL_LOADED:
+            cmap = mpl.cm.get_cmap('Spectral')
+            lons = [city['lon'] for city in cities]
+            lon_norm = mpl.colors.Normalize(vmin=min(lons), vmax=max(lons))
+            style['fillColor'] = lambda city: cmap(lon_norm(city['lon']))
+            point_feature.style = style
+        else:
+            point_feature.colormap = {
+                'colorseries': 'rainbow',
+                'field': 'lon',
+                'range': [-118.2436849, -74.0059413]
+            }
+
 
         # Quad data
         feature_data = [{

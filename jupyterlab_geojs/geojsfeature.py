@@ -70,8 +70,44 @@ class GeoJSFeature:
         for key,val in style.items():
             if callable(val):
                 item_vals = [val(item) for item in data]
+
+                # Check format for styles that set color
+                if key in ['fillColor']:
+                    item_vals = self._format_colors(item_vals)
                 style[key] = item_vals
 
         display_model['options'] = self._options
 
         return display_model
+
+    def _format_colors(self, input_vals):
+        '''Converts input colors to hex format.
+
+        This only applies to colors produced by a callable
+        '''
+        # Use first item as exemplar
+        input0 = input_vals[0]
+        # Abort for unexpected input
+        if not isinstance(input0, (list,tuple)):
+            return input_vals
+        if len(input0) < 3 or len(input0) > 4:
+            return input_vals
+        if len(input0) == 4:
+            input0 = list(input0[:3])
+
+        if max(input0) <= 1:
+            return[self._double_to_hex(item) for item in input_vals]
+        elif max(input0) <= 255:
+            return [self._rgb_to_hex(item) for item in input_vals]
+
+        # else:
+        return input_vals  # dont understand format
+
+
+    def _double_to_hex(self, color):
+        rgb = tuple(map(lambda val: int(255.0 * val), color))
+        return self._rgb_to_hex(rgb)
+
+    def _rgb_to_hex(self, rgb):
+        hexVal = tuple(map(lambda val: '{:02x}'.format(val), rgb[:3]))
+        return '#' + ''.join(hexVal)

@@ -49,6 +49,7 @@ class TestGeoJSONFeatures(unittest.TestCase):
     def test_shpfile_features(self):
         '''Test creating geojson feature from shp file'''
         scene = Scene()
+        osm_layer = scene.create_layer('osm');
         feature_layer = scene.create_layer('feature', features=['polygon'])
 
         filename = os.path.join(utils.data_folder, 'polygons.shp')
