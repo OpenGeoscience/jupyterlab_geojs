@@ -55,6 +55,23 @@ class GeoJSFeature:
             value = getattr(self, name, None)
             if value is not None:
                 self._options[name] = value
+
+        # Apply any lambda functions
+        data = self._options.get('data')
+
+        # Check position
+        position = self._options.get('position')
+        if position is not None and callable(position):
+            position_coords = [position(item) for item in data]
+            self._options['position'] = position_coords
+
+        # Check style components
+        style = self._options.get('style', {})
+        for key,val in style.items():
+            if callable(val):
+                item_vals = [val(item) for item in data]
+                style[key] = item_vals
+
         display_model['options'] = self._options
 
         return display_model

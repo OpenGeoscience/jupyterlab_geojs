@@ -1,4 +1,5 @@
 import logging
+import math
 import unittest
 
 logging.basicConfig(level=logging.DEBUG)
@@ -26,10 +27,23 @@ class TestBasicFeatures(unittest.TestCase):
             {'lon': -75.1652215, 'lat': 39.9525839, 'name': "Philadelphia", 'population': 1553165},
             {'lon': -112.0740373, 'lat': 33.4483771, 'name': "Phoenix", 'population': 1513367}
         ]
-        positions = [{'x':city['lon'], 'y':city['lat']} for city in cities]
-        style = {'strokeColor': 'black', 'strokeWidth': 2, 'radius': 12}
+        # Use lambda function to set point positions
+        position = lambda city: {'x':city['lon'], 'y':city['lat']}
+
+        style = {'strokeColor': 'black', 'strokeWidth': 2}
+
+        # Use lambda function to set point radius
+        populations = [city['population'] for city in cities]
+        pmin = min(populations)
+        # pmax = max(populations)
+        # pdiff = pmax - pmin
+        # pscale = lambda city: (city['population'] - pmin) / pdiff
+        # Scale area proportional to population ratio
+        rmin = 8  # minimum radius
+        style['radius'] = lambda city: int(math.sqrt(rmin*rmin*city['population']/pmin))
+
         point_feature = feature_layer.create_feature(
-            'point', cities, position=positions, style=style)
+            'point', cities, position=position, style=style)
         point_feature.enableTooltip = True  # adds ui layer in JS but NOT in python
         point_feature.colormap = {
             'colorseries': 'rainbow',
