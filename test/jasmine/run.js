@@ -26,6 +26,9 @@ global.self = {
   navigator: global.navigator
 }
 
+// This fixes nonfatal errors when testing raster features
+global.HTMLCanvasElement = window.HTMLCanvasElement;
+
 // For some reason, the inherit() needs to be mocked
 function newfunc() {
   return function() {};

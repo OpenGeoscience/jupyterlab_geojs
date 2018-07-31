@@ -106,13 +106,13 @@ class GeoJSBuilder {
     if (viewpoint) {
       switch (viewpoint.mode) {
         case 'bounds':
-          console.log('Input viewpoint bounds:');
-          console.dir(viewpoint.bounds);
-          let spec = this._geoMap.zoomAndCenterFromBounds(viewpoint.bounds, 0, null);
-          console.log('Computed viewpoint spec:')
-          console.dir(spec);
+          // console.log('Input viewpoint bounds:');
+          // console.dir(viewpoint.bounds);
+          let spec = this._geoMap.zoomAndCenterFromBounds(viewpoint.bounds);
+          // console.log('Computed viewpoint spec:')
+          // console.dir(spec);
           this._geoMap.center(spec.center);
-          this._geoMap.zoom(spec.zoom/2);  // apparently a factor of 2 difference (?)
+          this._geoMap.zoom(spec.zoom);
         break;
 
         default:

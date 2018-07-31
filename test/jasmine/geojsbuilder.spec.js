@@ -100,4 +100,27 @@ describe('GeoJSBuilder', () => {
     expect(layer1.features().length).toBe(1)  // 1 quad feature
   });
 
+  it('should load raster features without GeoJSBuilder', () => {
+    let node = document.querySelector('#map');
+    geoMap = geo.map({node: node});
+
+    let featureLayer = geoMap.createLayer('feature', {features: ['quad.image']});
+    let featureData = {
+      image: '../data/rasterwithpalette.png',
+      ll: { x: -73.758345, y: 41.849604 },
+      lr: { x: -72.758345, y: 41.849604 },
+      ul: { x: -73.758345, y: 42.849604 },
+      ur: { x: -72.758345, y: 42.849604 }
+    };
+    let feature = featureLayer.createFeature('quad').data([featureData]);
+
+    const bounds = {"bottom": 41.849604, "left": -73.758345, "right": -72.758345, "top": 42.849604}
+    let spec = geoMap.zoomAndCenterFromBounds(bounds);
+    // console.log('Computed viewpoint spec:');
+    // console.dir(spec);
+    geoMap.center(spec.center);
+    geoMap.zoom(spec.zoom / 2);
+    //console.dir(node);
+  });
+
 });
