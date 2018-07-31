@@ -1,7 +1,6 @@
 /*
  * Class for generating geomap based on geojs model received from Jupyter kernel.
  */
-//import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
 
 import { JSONObject } from '@phosphor/coreutils';
 
@@ -24,6 +23,10 @@ export interface IMapModel {
   layers?: ILayerModel[];
   options?: JSONObject;
   viewpoint?: JSONObject;
+}
+
+interface IStringMap {
+  [key: string] : any;
 }
 
 
@@ -103,13 +106,13 @@ class GeoJSBuilder {
     if (viewpoint) {
       switch (viewpoint.mode) {
         case 'bounds':
-          console.log('Input viewpoint bounds:');
-          console.dir(viewpoint.bounds);
-          let spec = this._geoMap.zoomAndCenterFromBounds(viewpoint.bounds, 0, null);
-          console.log('Computed viewpoint spec:')
-          console.dir(spec);
+          // console.log('Input viewpoint bounds:');
+          // console.dir(viewpoint.bounds);
+          let spec = this._geoMap.zoomAndCenterFromBounds(viewpoint.bounds);
+          // console.log('Computed viewpoint spec:')
+          // console.dir(spec);
           this._geoMap.center(spec.center);
-          this._geoMap.zoom(spec.zoom/2);  // apparently a factor of 2 difference (?)
+          this._geoMap.zoom(spec.zoom);
         break;
 
         default:
@@ -148,7 +151,7 @@ class GeoJSBuilder {
 
 
   // Creates features
-  _createFeatures(layer: any, featureModels: IFeatureModel[]): any {
+  _createFeatures(layer: any, featureModels: IFeatureModel[]): void {
     for (let featureModel of featureModels) {
       //console.dir(featureModel);
       switch(featureModel.featureType) {
@@ -201,12 +204,29 @@ class GeoJSBuilder {
           }
 
           // Other options that are simple properties
-          const properties = ['bin', 'gcs', 'style', 'selectionAPI', 'visible']
+          const properties = ['bin', 'gcs', 'selectionAPI', 'visible']
           for (let property of properties) {
             if (options[property]) {
               feature[property](options[property]);
             }
           }
+
+          // Handle style separately, since its components can be constant or array
+          const styleProperties = options.style as IStringMap || {};
+          let useStyle: IStringMap = {};
+          for (let key in styleProperties) {
+            let val: any = styleProperties[key]
+            if (Array.isArray(val)) {
+              useStyle[key] = function(d: IStringMap): any {
+                let index = d.__i as number;
+                return val[index];
+              }
+            }
+            else {
+              useStyle[key] = val;
+            }
+          }
+          feature['style'](useStyle);
 
           // Events - note that we must explicitly bind to "this"
           if (options.enableTooltip) {

@@ -18,16 +18,16 @@ class GeoJSOSMLayer:
         # Internal members
         self._options = kwargs
 
-    def _build_data(self):
+    def _build_display_model(self):
         ''''''
-        data = dict()  # return value
-        data['layerType'] = 'osm'
+        display_model = dict()  # return value
+        display_model['layerType'] = 'osm'
 
         # Copy options that have been set
         for name in self.__class__.OptionNames:
             value = getattr(self, name, None)
             if value is not None:
                 self._options[name] = value
-        data['options'] = self._options
+        display_model['options'] = self._options
 
-        return data
+        return display_model

@@ -25,6 +25,6 @@ class TestLASPointCloud(unittest.TestCase):
         self.assertEqual(las._feature.get_point_count(), 100)
         self.assertIsNone(las._feature.get_wkt_string())
 
-        data = las._feature._build_data()
+        display_model = las._feature._build_display_model()
 
-        utils.write_model(data, 'laspointcloud_100.json')
+        utils.write_model(display_model, 'laspointcloud_100.json')

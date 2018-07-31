@@ -1,37 +1,51 @@
 import json
 import os
+from urllib.parse import urlparse
 
 from . import gdalutils
 from .geojsfeature import GeoJSFeature
 
 class GeoJSONFeature(GeoJSFeature):
     ''''''
-    def __init__(self, data=None, filename=None, url=None, **kwargs):
+    def __init__(self, data, **kwargs):
         super(GeoJSONFeature, self).__init__('geojson', config_options=False, **kwargs)
-        self._data = None
-        self._url = None
+        self._json_data = None
+        self._uri = None
 
-        if data is not None:
-            self._data = data
-        elif filename is not None:
+        # Determine if input data is filename, uri, or raw data
+        filename = None
+        if isinstance(data, str):
+            parsed_url = urlparse(data)
+            if not bool(parsed_url.scheme):
+                # If not scheme, then we presume it is a file/path
+                filename = data
+            elif parsed_url.scheme == 'file':
+                # If scheme is a file, strip the scheme and use the rest as file/path
+                n = len('file://')
+                filename = data[n:]
+            else:
+                # Otherwise infer it is a network url
+                self._url = data
+        elif isinstance(data, dict):
+            self._json_data = data
+        else:
+            raise Exception('Unrecognized input data not a string or dict: {}'.format(data))
+
+        if filename is not None:
             # Load data here, because javascript cannot load from
-            # local filesystem due to browser security restriction.
+            # filesystem due to browser security restriction.
             if not os.path.exists(filename):
                 raise Exception('Cannot find file {}'.format(filename))
 
             root, ext = os.path.splitext(filename)
             if ext == '.shp':
-                self._data = self._convert_shp(filename)
+                # Convert shape files to geojson format
+                self._json_data = self._convert_shp(filename)
             else:
                 # Logic for standard geojson files
                 with open(filename) as f:
                     text = f.read()
-                self._data = json.loads(text)
-        if url is not None:
-            self._url = url
-
-        if self._data is None and self._url is None:
-            raise Exception('Missing data, filename, or url argument')
+                self._json_data = json.loads(text)
 
 
     def _convert_shp(self, filename):
@@ -54,10 +68,10 @@ class GeoJSONFeature(GeoJSFeature):
             fc['features'].append(feature.ExportToJson(as_object=True))
         return fc
 
-    def _build_data(self):
-        data = super(GeoJSONFeature, self)._build_data()
-        if self._data is not None:
-            data['data'] = self._data
+    def _build_display_model(self):
+        display_model = super(GeoJSONFeature, self)._build_display_model()
+        if self._json_data is not None:
+            display_model['data'] = self._json_data
         elif self._url is not None:
-            data['url'] = self._url
-        return data
+            display_model['url'] = self._url
+        return display_model

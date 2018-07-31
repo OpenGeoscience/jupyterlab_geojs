@@ -33,7 +33,7 @@
     "@types/react-dom": "^16.0.6",
     "babel-cli": "^6.26.0",
     "base64-arraybuffer": "^0.1.5",
-    "colorkit": "^1.1.1",
+    "colorkit": "^1.2.0",
     "geojs": "^0.16.0",
     "react": "^16.4.0",
     "vtk.js": "^7.3.2"
@@ -56,7 +56,7 @@
   },
   "scripts": {
     "build": "webpack && tsc",
-    "build:browser": "node node_modules/rollup/bin/rollup --config test/browser/rollup.config.js",
+    "build:browser": "tsc && node node_modules/rollup/bin/rollup --config test/browser/rollup.config.js",
     "build:extension": "tsc",
     "build:las-test": "webpack --config test/las/webpack.config.js",
     "build:schema": "node ./project/schema/combine_schemas.js",

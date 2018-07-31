@@ -2,7 +2,7 @@ import os
 import unittest
 
 from . import utils
-from jupyterlab_geojs import GeoJSMap, gdalutils
+from jupyterlab_geojs import Scene, gdalutils
 
 
 class TestPointCloudFeatures(unittest.TestCase):
@@ -11,9 +11,9 @@ class TestPointCloudFeatures(unittest.TestCase):
         '''Test creating pointcloud feature'''
         filename = os.path.join(utils.data_folder, '100-points.las')
 
-        geo_map = GeoJSMap()
-        feature_layer = geo_map.createLayer('feature')
-        pointcloud = feature_layer.createFeature('pointcloud', filename=filename)
+        scene = Scene()
+        feature_layer = scene.create_layer('feature')
+        pointcloud = feature_layer.create_feature('pointcloud', data=filename)
         self.assertEqual(pointcloud.get_point_count(), 100)
         self.assertEqual(pointcloud.get_point_data_record_formats(), {3: 100})
         self.assertEqual(pointcloud.get_point_count_by_return(), (89, 10, 1, 0, 0))
@@ -28,13 +28,13 @@ class TestPointCloudFeatures(unittest.TestCase):
         # atts = pointcloud.get_point_attributes()
         # print(atts)
 
-        data = geo_map._build_data()
+        display_model = scene._build_display_model()
 
-        utils.write_model(data, 'pointcloud-100_model.json')
-        utils.validate_model(data)
+        utils.write_model(display_model, 'pointcloud-100_model.json')
+        utils.validate_model(display_model)
 
         # data should contain "data" field
-        layers = data.get('layers', {})
+        layers = display_model.get('layers', {})
         features = layers[0].get('features')
         feature = features[0]
         self.assertIsNotNone(feature)
@@ -48,11 +48,11 @@ class TestPointCloudFeatures(unittest.TestCase):
             data = f.read()
         self.assertGreater(len(data), 30000)  # (sanity check)
 
-        geo_map = GeoJSMap()
-        feature_layer = geo_map.createLayer('feature')
+        scene = Scene()
+        feature_layer = scene.create_layer('feature')
 
-        #pointcloud = feature_layer.createFeature('pointcloud', data=data)
-        self.assertRaises(Exception, feature_layer.createFeature, 'pointcloud', data=data)
+        #pointcloud = feature_layer.create_feature('pointcloud', data=data)
+        self.assertRaises(Exception, feature_layer.create_feature, 'pointcloud', data=data)
 
         # self.assertEqual(pointcloud.get_point_count(), 1000)
         # self.assertEqual(pointcloud.get_point_count_by_return(), (974, 23, 2, 1, 0))
@@ -76,7 +76,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         #     self.assertAlmostEqual(lonlat_bounds[0], min_x, 6)  # lon min
         #     self.assertAlmostEqual(lonlat_bounds[3], max_y, 6)  # lat max
 
-        # data = geo_map._build_data()
+        # data = scene._build_display_model()
 
         # #utils.write_model(data, 'test1_4.json')
         # utils.validate_model(data)
@@ -88,7 +88,7 @@ class TestPointCloudFeatures(unittest.TestCase):
         # self.assertIsNotNone(feature)
         # self.assertTrue('data' in feature)
 
-        # data = geo_map._build_data()
+        # data = scene._build_display_model()
         #print(data)
         #utils.write_model(data, 'test1_4.json')
 

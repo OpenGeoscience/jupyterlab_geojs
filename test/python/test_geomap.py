@@ -4,27 +4,27 @@ import unittest
 logging.basicConfig(level=logging.DEBUG)
 
 from . import utils
-from jupyterlab_geojs import GeoJSMap
+from jupyterlab_geojs import Scene
 
 
 class TestGeoMap(unittest.TestCase):
 
     def test_basic_model(self):
         '''Test creating simple map with osm and feature layer'''
-        geo_map = GeoJSMap(zoom=10)  # pass in option to constructor
-        geo_map.center = {'x': -73, 'y': 42.5}  # set option as public member
-        osm_layer = geo_map.createLayer('osm')
-        feature_layer = geo_map.createLayer('feature')
-        data = geo_map._build_data()
-        #print(data)
+        scene = Scene(zoom=10)  # pass in option to constructor
+        scene.center = {'x': -73, 'y': 42.5}  # set option as public member
+        osm_layer = scene.create_layer('osm')
+        feature_layer = scene.create_layer('feature')
+        display_model = scene._build_display_model()
+        #print(display_model)
 
-        utils.validate_model(data)
+        utils.validate_model(display_model)
 
-        self.assertIsInstance(data, dict)
-        self.assertTrue('options' in data)
-        self.assertTrue('layers' in data)
+        self.assertIsInstance(display_model, dict)
+        self.assertTrue('options' in display_model)
+        self.assertTrue('layers' in display_model)
 
-        utils.write_model(data, 'basic_model.json')
+        utils.write_model(display_model, 'basic_model.json')
 
 if __name__ == '__main__':
     unittest.main()

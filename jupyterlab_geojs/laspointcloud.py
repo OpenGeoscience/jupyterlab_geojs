@@ -51,9 +51,9 @@ class LASPointCloud(JSON):
         if self._logger is not None:
             self._logger.debug('Enter LASPointCloud._ipython_display_()')
 
-        data = self._feature._build_data()
+        display_model = self._feature._build_display_model()
         bundle = {
-            MIME_TYPE: data,
+            MIME_TYPE: display_model,
             'text/plain': '<jupyterlab_geojs.LASPointCloud object>'
         }
         metadata = {

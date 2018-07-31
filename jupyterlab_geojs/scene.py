@@ -5,18 +5,19 @@ from IPython.display import display, JSON
 from .geojsfeaturelayer import GeoJSFeatureLayer
 from .geojsosmlayer import GeoJSOSMLayer
 from .scenevalidator import SceneValidator
+from .types import LayerType
 
 # A display class that can be used in Jupyter notebooks:
-#   from jupyterlab_geojs import GeoJSMap
-#   GeoJSMap()
+#   from jupyterlab_geojs import Scene
+#   Scene()
 
 MIME_TYPE = 'application/geojs+json'
 
 
-class GeoJSMap(JSON):
+class Scene(JSON):
     """A display class for displaying GeoJS visualizations in the Jupyter Notebook and IPython kernel.
 
-    GeoJSMap expects a JSON-able dict, not serialized JSON strings.
+    Scene expects a JSON-able dict, not serialized JSON strings.
 
     Scalar types (None, number, string) are not allowed, only dict containers.
     """
@@ -43,7 +44,7 @@ class GeoJSMap(JSON):
     def __init__(self, **kwargs):
         '''
         '''
-        super(GeoJSMap, self).__init__()
+        super(Scene, self).__init__()
         # Public members
         for name in self.__class__.OptionNames:
             value = kwargs.get(name)
@@ -68,14 +69,14 @@ class GeoJSMap(JSON):
             'bottom': None
         }
 
-    def createLayer(self, layer_type, **kwargs):
+    def create_layer(self, layer_type, **kwargs):
         self._validator.adding_layer(self, layer_type)
         if False: pass
         # elif layer_type == 'annotation':
         #     layer = GeoJSAnnotationLayer(**kwargs)
-        elif layer_type == 'feature':
+        elif layer_type == LayerType.FEATURE:
             layer = GeoJSFeatureLayer(**kwargs)
-        elif layer_type == 'osm':
+        elif layer_type == LayerType.OSM:
             layer = GeoJSOSMLayer(**kwargs)
         # elif layer_type == 'ui':
         #     layer = GeoJSUILayer(**kwargs)
@@ -86,7 +87,7 @@ class GeoJSMap(JSON):
         self._validator.added_layer(self, layer)
         return layer
 
-    def create_logger(self, folder, filename='geojsmap.log'):
+    def create_logger(self, folder, filename='scene.log'):
         '''Initialize logger with file handler
 
         @param folder (string) directory to store logfile
@@ -118,7 +119,7 @@ class GeoJSMap(JSON):
             self._viewpoint.bounds['top']    = max(y_coords)
             self._viewpoint.bounds['bottom'] = min(y_coords)
 
-    def _build_data(self):
+    def _build_display_model(self):
         data = dict()  # return value
 
         # Copy options that have been set
@@ -137,22 +138,22 @@ class GeoJSMap(JSON):
 
         layer_list = list()
         for layer in self._layers:
-            layer_list.append(layer._build_data())
+            layer_list.append(layer._build_display_model())
         data['layers'] = layer_list
         return data
 
 
     def _ipython_display_(self):
         if self._logger is not None:
-            self._logger.debug('Enter GeoJSMap._ipython_display_()')
-        data = self._build_data()
+            self._logger.debug('Enter Scene._ipython_display_()')
+        display_model = self._build_display_model()
 
         # Change mime type for "pointcloud mode"
         mimetype = 'application/las+json' if self._validator.is_pointcloud(self) else MIME_TYPE
 
         bundle = {
-            mimetype: data,
-            'text/plain': '<jupyterlab_geojs.GeoJSMap object>'
+            mimetype: display_model,
+            'text/plain': '<jupyterlab_geojs.Scene object>'
         }
         metadata = {
             mimetype: self.metadata

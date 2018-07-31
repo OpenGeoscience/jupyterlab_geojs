@@ -5,7 +5,7 @@ but not both:
  * Regular GeoJS layers and features
  * One feature layer with one point cloud feature
 
- To make things work via a single class (GeoJSMap), this class
+ To make things work via a single class (Scene), this class
  checks each new layer and feature as it is created, and raises an
  Exception if the current limitations are not met. The intent is to
  isolate as much of the validity-checking code as possible, with the
@@ -32,11 +32,11 @@ class _SceneValidator:
         if _SceneValidator.instance:
             raise Exception('Error creating _SceneValidator - use scene_validator instead')
 
-        self._mapDict = dict()    # <GeoJSMap instance, _SceneMode>
-        self._layerDict = dict()  # <GeoJSLayer instance, GeoJSMap instance>
+        self._mapDict = dict()    # <Scene instance, _SceneMode>
+        self._layerDict = dict()  # <GeoJSLayer instance, Scene instance>
 
     def adding_map(self, map):
-        '''This must be called when a new GeoJSMap instance is initialized
+        '''This must be called when a new Scene instance is initialized
 
         '''
         assert(not map in self._mapDict)
