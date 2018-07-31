@@ -9,7 +9,7 @@ data using the GeoJS front end library
 
 ## Prerequisites
 
-* JupyterLab ^0.28.0 and/or Notebook >=4.3.0
+* JupyterLab ^0.32.1 and Notebook >=5.5.0
 
 ## Usage
 
@@ -29,15 +29,15 @@ The notebooks folder contains examples.
 ## Install
 
 ```bash
-pip install jupyterlab_geojs
+# Install this lab extension
+jupyter labextension install @johnkit/jupyterlab_geojs
 
-# For JupyterLab, need widget-manager extension:
+# Also need to install the widget-manager extension
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
-jupyter lab build
+# Install the python package
+pip install jupyterlab_geojs
 
-# For Notebook
-jupyter nbextension enable --py --sys-prefix jupyterlab_geojs
 ```
 
 ## Development

@@ -1,7 +1,7 @@
 {
-  "name": "jupyterlab_geojs",
-  "version": "0.1.0",
-  "description": "A package for rendering GeoJS in Jupyter",
+  "name": "@johnkit/jupyterlab_geojs",
+  "version": "0.3.1",
+  "description": "A package for rendering GeoJS scenes in JupyterLab",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -71,5 +71,6 @@
     ]
   },
   "author": "Kitware",
-  "license": "BSD-3-Clause"
+  "license": "BSD-3-Clause",
+  "repository": "https://github.com/OpenGeoscience/jupyterlab_geojs"
 }
