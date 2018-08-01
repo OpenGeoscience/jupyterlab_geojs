@@ -17,5 +17,8 @@ test/las/pointcloud.bundle.js
 *checkpoint.*
 jupyterlab_geojs/__logs__/*.log
 
+# Python distribution
+dist/
+
 # OS X
 .DS_Store
