@@ -18,7 +18,7 @@ To render GeoJS output in JupyterLab:
 ```python
 from jupyterlab_geojs import Scene
 scene = Scene()
-scene.create_layer('osm')
+osm_layer = scene.create_layer('osm')
 scene
 
 ```
