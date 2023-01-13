@@ -46,7 +46,7 @@
     "jasmine": "^3.1.0",
     "jsdom": "^11.12.0",
     "json-schema-ref-parser": "^5.1.2",
-    "kw-web-suite": "^6.2.0",
+    "kw-web-suite": "^11.1.0",
     "pug-cli": "^1.0.0-alpha6",
     "rimraf": "~2.6.2",
     "rollup": "^0.63.5",
